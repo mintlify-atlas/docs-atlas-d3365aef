@@ -1,0 +1,126 @@
+---
+title: "Full-stack feature development with multi-agent AI"
+description: "Build complete features end-to-end using Claude Code Agents' full-stack orchestrator, coordinating backend, frontend, testing, and deployment agents."
+---
+
+The full-stack orchestration plugin coordinates seven or more specialized agents to take a feature from initial requirements through architecture, implementation, testing, security review, deployment, and observability — all in a single command. Rather than manually switching between tools and contexts, the orchestrator maintains state across each phase and waits for your explicit approval at key checkpoints before proceeding.
+
+## Install the plugin
+
+```bash
+/plugin marketplace add wshobson/agents
+/plugin install full-stack-orchestration
+```
+
+## Run a full-stack feature
+
+Pass a plain-language description of the feature you want to build. Optional flags let you specify the stack, API style, and complexity:
+
+```bash
+/full-stack-orchestration:full-stack-feature "user authentication with OAuth2"
+/full-stack-orchestration:full-stack-feature "real-time dashboard" --stack react/fastapi/postgres --api-style graphql
+/full-stack-orchestration:full-stack-feature "payment checkout flow" --complexity complex
+```
+
+The command saves all intermediate artifacts to `.full-stack-feature/` so you can inspect, resume, or archive any session.
+
+## How the agent chain works
+
+<Steps>
+  <Step title="Requirements gathering (interactive)">
+    The orchestrator asks you one question at a time — problem statement, acceptance criteria, out-of-scope items, technical constraints, stack confirmation, and dependencies — then writes `.full-stack-feature/01-requirements.md`.
+  </Step>
+  <Step title="Database schema design (database-architect)">
+    A database-architect agent designs the entity relationships, migration strategy, indexing plan, and data access patterns based on your requirements. Output: `.full-stack-feature/02-database-design.md`.
+  </Step>
+  <Step title="Backend and frontend architecture (backend-architect)">
+    A full-stack architect designs the API contract, service layer boundaries, component hierarchy, state management plan, and cross-cutting concerns like error handling and security. Output: `.full-stack-feature/03-architecture.md`.
+
+    <Note>
+      **Phase checkpoint.** The orchestrator pauses here and shows you a summary of the database and architecture designs. You must approve before implementation begins, or request changes.
+    </Note>
+  </Step>
+  <Step title="Database implementation">
+    Migration scripts, ORM models, and the repository layer are written following the approved schema. Output: `.full-stack-feature/04-database-impl.md`.
+  </Step>
+  <Step title="Backend implementation (backend-architect)">
+    API endpoints, business logic, auth middleware, input validation, structured logging, and observability hooks are implemented. Output: `.full-stack-feature/05-backend-impl.md`.
+  </Step>
+  <Step title="Frontend implementation (frontend-developer)">
+    UI components, state management, API integration, form handling, loading states, and accessibility basics (semantic HTML, ARIA, keyboard navigation) are built. Output: `.full-stack-feature/06-frontend-impl.md`.
+  </Step>
+  <Step title="Testing, security, and performance (test-automator + security-auditor + performance-engineer)">
+    Three agents run in parallel: `test-automator` writes unit, integration, and E2E tests targeting 80%+ coverage; `security-auditor` reviews for OWASP Top 10, injection risks, and auth flaws; `performance-engineer` identifies N+1 queries, missing indexes, and bundle concerns. Critical findings are addressed before the phase ends. Output: `.full-stack-feature/07-testing.md`.
+
+    <Note>
+      **Phase checkpoint.** The orchestrator presents the test coverage summary and any security or performance findings. You approve, request fixes, or pause.
+    </Note>
+  </Step>
+  <Step title="Deployment and infrastructure (deployment-engineer)">
+    CI/CD pipeline configuration, database migration steps, feature flag setup, health checks, monitoring alerts, and a deployment runbook with rollback instructions are created. Output: `.full-stack-feature/08-deployment.md`.
+  </Step>
+  <Step title="Documentation and handoff">
+    API documentation, database migration notes, an architecture decision record (ADR), and a handoff summary are written. Output: `.full-stack-feature/09-documentation.md`.
+  </Step>
+</Steps>
+
+## What each agent contributes
+
+<CardGroup cols={2}>
+  <Card title="backend-architect" icon="server">
+    Designs RESTful or GraphQL APIs, service boundaries, auth patterns, resilience strategies, and observability hooks. Uses the `api-design-principles`, `architecture-patterns`, and `microservices-patterns` skills.
+  </Card>
+  <Card title="database-architect" icon="database">
+    Designs entity relationships, migration strategies, indexing plans, and repository interfaces. Runs on Opus for production-grade schema decisions.
+  </Card>
+  <Card title="frontend-developer" icon="layout">
+    Builds React 19 / Next.js 15 components with proper TypeScript types, state management (Zustand, TanStack Query), and WCAG accessibility patterns.
+  </Card>
+  <Card title="test-automator" icon="flask">
+    Creates the full test pyramid — unit, integration, and E2E — following existing project patterns and targeting 80%+ code coverage on new code.
+  </Card>
+  <Card title="security-auditor" icon="shield">
+    Reviews for OWASP Top 10 vulnerabilities, authentication and authorization flaws, injection risks, XSS/CSRF vectors, and data protection gaps.
+  </Card>
+  <Card title="deployment-engineer" icon="rocket">
+    Writes CI/CD pipeline configs, feature flag rollout plans, health check definitions, monitoring alerts, and a rollback runbook.
+  </Card>
+  <Card title="performance-engineer" icon="gauge">
+    Identifies N+1 queries, missing database indexes, unoptimized payloads, memory leaks, and unnecessary re-renders before code ships.
+  </Card>
+  <Card title="observability-engineer" icon="chart-line">
+    Configures production monitoring, distributed tracing, SLI/SLO definitions, and alerting thresholds for the new feature.
+  </Card>
+</CardGroup>
+
+## Resume an in-progress session
+
+If a session is interrupted, re-run the same command. The orchestrator detects `.full-stack-feature/state.json` and asks whether to resume from the last completed step or start fresh:
+
+```bash
+/full-stack-orchestration:full-stack-feature "user authentication with OAuth2"
+# → Found an in-progress session at step 5. Resume or start fresh?
+```
+
+## Composing with other plugins
+
+The full-stack orchestrator is designed to work alongside the rest of the marketplace. Common patterns:
+
+```bash
+# After orchestration, run a deeper security scan
+/security-scanning:security-hardening --depth comprehensive
+
+# Generate OpenAPI and C4 architecture documentation
+/documentation-generation:doc-generate
+/c4-architecture:c4-architecture
+
+# Add WCAG accessibility audit on the generated frontend
+/accessibility-compliance:accessibility-audit
+
+# Wire up full observability stack
+/observability-monitoring:monitor-setup
+```
+
+<Tip>
+  Install `backend-development` alongside `full-stack-orchestration` to add TDD workflows and GraphQL architecture capabilities that the full-stack agents can invoke via natural language.
+</Tip>

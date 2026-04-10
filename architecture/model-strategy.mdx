@@ -1,0 +1,151 @@
+---
+title: "Three-tier model strategy: Opus, Sonnet, and Haiku"
+description: "Understand how Claude Code Agents assigns Opus, Sonnet, and Haiku models strategically across 182 agents to optimize performance and cost."
+---
+
+Not every task deserves the most powerful model — and not every task can afford a lightweight one. Claude Code Agents uses a deliberate four-tier model assignment strategy across all 182 agents, matching each agent's model to the cognitive demands of its domain. The result is a system that applies Opus where correctness and depth matter most, Haiku where speed and cost efficiency dominate, and gives users explicit control over the middle ground via the `inherit` tier.
+
+## Model Tier Overview
+
+| Tier | Model | Agents | Primary Use Case |
+|------|-------|--------|-----------------|
+| **Tier 1** | Opus 4.6 | 42 | Critical architecture, security, ALL code review, production coding (language pros, frameworks) |
+| **Tier 2** | Inherit | 42 | Complex tasks — user chooses model (AI/ML, backend, frontend/mobile, specialized) |
+| **Tier 3** | Sonnet 4.6 | 51 | Support with intelligence (docs, testing, debugging, network, API docs, DX, legacy, payments) |
+| **Tier 4** | Haiku 4.5 | 18 | Fast operational tasks (SEO, deployment, simple docs, sales, content, search) |
+
+## Why These Tiers?
+
+<Tabs>
+  <Tab title="Tier 1 — Opus 4.6">
+    Opus 4.6 is assigned to the 42 agents where mistakes are most costly: architectural decisions, security audits, and all forms of code review.
+
+    **Why Opus for these agents?**
+
+    - **80.8% on SWE-bench** — industry-leading score on real-world software engineering tasks
+    - **65% fewer tokens on complex tasks** — Opus's superior reasoning often resolves problems in fewer steps, partially offsetting its higher per-token cost
+    - **Best for open-ended reasoning** — architecture decisions, security threat modeling, and code review require holding many competing considerations simultaneously
+
+    **Agents assigned Opus:**
+    - All architecture agents (`backend-architect`, `graphql-architect`, `cloud-architect`, `kubernetes-architect`, etc.)
+    - All code review agents (`code-reviewer`, `architect-reviewer`, `security-auditor`)
+    - Security and threat modeling specialists (`threat-modeling-expert`, `backend-security-coder`)
+    - Incident response and performance engineers (`incident-responder`, `performance-engineer`, `observability-engineer`)
+
+    <Note>
+      ALL code review agents run on Opus regardless of domain. A code review that misses a security issue or architectural flaw is more expensive to fix than the cost difference between Opus and Sonnet.
+    </Note>
+  </Tab>
+  <Tab title="Tier 2 — Inherit">
+    The `inherit` tier contains 42 agents that handle complex work, but where the right model depends heavily on the user's priorities and budget. These agents adopt whatever model is active in the current Claude Code session.
+
+    **How it works:**
+
+    ```bash
+    # Start a session with Opus — inherit agents use Opus
+    claude --model opus
+
+    # Start a session with Sonnet — inherit agents use Sonnet
+    claude --model sonnet
+
+    # No model specified — inherit agents fall back to Sonnet 4.6
+    claude
+    ```
+
+    **Agents in the inherit tier:**
+    - AI/ML agents (model training, LLM application development, RAG pipelines)
+    - Frontend and mobile developers
+    - Specialized domain agents where the user's use case varies widely
+
+    **When to use Opus with inherit agents:**
+    - AI/ML engineers working on complex model architectures
+    - Frontend developers tackling difficult state management problems
+    - Any high-stakes work where correctness matters more than cost
+
+    **When to use Sonnet with inherit agents:**
+    - High-volume frontend tasks (generating components, writing CSS)
+    - Iterative ML experimentation where speed matters
+    - Cost-sensitive workflows with many repeated invocations
+  </Tab>
+  <Tab title="Tier 3 — Sonnet 4.6">
+    Sonnet 4.6 handles 51 agents across domains where intelligence is important but the tasks are more structured and the blast radius of errors is smaller.
+
+    **Assigned to:**
+    - Language specialists (`python-pro`, `typescript-pro`, `javascript-pro`, `rust-pro`, `golang-pro`, etc.)
+    - Framework agents (`django-pro`, `fastapi-pro`, `ruby-pro`, `java-pro`)
+    - Documentation generation and technical writing
+    - Test automation and test generation
+    - Debugging and diagnostic agents
+    - Developer experience (DX) agents
+    - Legacy code analysis, payment integration, and data engineering
+
+    Sonnet strikes a balance: capable enough to produce accurate, high-quality outputs for these domains, but more cost-effective than Opus for the volume of work typically generated in documentation and testing workflows.
+  </Tab>
+  <Tab title="Tier 4 — Haiku 4.5">
+    Haiku 4.5 powers 18 agents where speed and cost efficiency are the primary requirements. These are mostly operational and content-generation tasks with well-defined outputs.
+
+    **Assigned to:**
+    - SEO content and technical SEO agents
+    - Deployment pipeline agents
+    - Simple documentation generators
+    - Sales and content marketing agents
+    - Search optimization agents
+
+    For tasks like generating SEO metadata, formatting deployment configs, or producing marketing copy, Haiku delivers fast results at the lowest cost in the stack.
+  </Tab>
+</Tabs>
+
+## Cost Considerations
+
+| Model | Input | Output | Notes |
+|-------|-------|--------|-------|
+| **Opus 4.6** | $5 / M tokens | $25 / M tokens | Premium — use for critical work |
+| **Sonnet 4.6** | $3 / M tokens | $15 / M tokens | Balanced performance and cost |
+| **Haiku 4.5** | $1 / M tokens | $5 / M tokens | Fast and cost-effective |
+
+Opus 4.6's 65% token reduction on complex tasks is an important offset. A task that takes Sonnet 800 output tokens to complete might take Opus 280 tokens — narrowing the effective cost difference significantly for complex reasoning work.
+
+For high-volume or iterative workflows, use the `inherit` tier with Sonnet to maintain control over costs. The `--model` flag at session start applies to all `inherit` agents for that session.
+
+## Orchestration Pattern
+
+The tiers work together across multi-agent workflows. The standard pattern is:
+
+```
+Opus (architecture decisions)
+  → Sonnet (implementation and development)
+    → Haiku (deployment and operational tasks)
+```
+
+**Example — Full-stack feature development:**
+
+```
+backend-architect [Opus]       designs the API contract
+  ↓
+database-architect [Opus]      designs the schema
+  ↓
+frontend-developer [inherit]   implements the UI
+  ↓
+test-automator [Sonnet]        generates the test suite
+  ↓
+security-auditor [Opus]        performs security review
+  ↓
+deployment-engineer [Sonnet]   configures CI/CD
+  ↓
+seo-content-writer [Haiku]     generates metadata (if applicable)
+```
+
+The most expensive model (Opus) handles decisions with the longest-lasting consequences. The cheapest model (Haiku) handles deterministic, high-volume operational steps. Sonnet handles the work in between.
+
+<Tip>
+  When running the `full-stack-orchestration` workflow, you can observe this tier pattern in action. Check the model displayed in each agent's invocation to see how the system shifts between tiers automatically.
+</Tip>
+
+<CardGroup cols={2}>
+  <Card title="Design Principles" icon="compass" href="/architecture/design-principles">
+    The core philosophy behind the plugin architecture
+  </Card>
+  <Card title="Plugin Structure" icon="folder-tree" href="/architecture/plugin-structure">
+    How plugins, agents, and skills are structured on disk
+  </Card>
+</CardGroup>

@@ -1,0 +1,170 @@
+---
+title: "Plugins: single-purpose units for Claude Code"
+description: "Understand how Claude Code Agents plugins work — what a plugin contains, how to install plugins, and how to compose them into workflows."
+---
+
+Plugins are the fundamental unit of the Claude Code Agents marketplace. Each plugin packages a focused, single-purpose set of capabilities — agents, commands, and skills — into an isolated directory that you install on demand. Rather than loading a monolithic toolbox into every session, you pick exactly the plugins you need, keeping Claude's context lean and every response more accurate.
+
+## What a plugin contains
+
+A plugin bundles three optional component types, all auto-discovered from its directory structure:
+
+| Component | Directory | Purpose |
+|-----------|-----------|---------|
+| **Agents** | `agents/` | Specialized AI experts with domain knowledge and a model assignment |
+| **Commands** | `commands/` | Slash-command tools, scaffolders, and workflow orchestrators |
+| **Skills** | `skills/` | Modular knowledge packages loaded progressively on demand |
+
+Installing `python-development`, for example, loads 3 Python agents, 1 scaffolding command, and makes 16 skills available — roughly 1 000 tokens of context, not the entire 77-plugin marketplace.
+
+<Note>
+You install **plugins**, not agents directly. Agents are bundled inside plugins. Running `/plugin install typescript-pro` will fail; the correct install is `/plugin install javascript-typescript`.
+</Note>
+
+## Plugin anatomy
+
+Every plugin lives under `plugins/<name>/` and requires at minimum a `plugin.json` manifest plus at least one agent or command.
+
+```
+plugins/python-development/
+├── .claude-plugin/
+│   └── plugin.json          # Plugin metadata (name, version, description)
+├── agents/
+│   ├── python-pro.md        # Agent: Python 3.12+ expert (opus)
+│   ├── django-pro.md        # Agent: Django specialist (sonnet)
+│   └── fastapi-pro.md       # Agent: FastAPI specialist (sonnet)
+├── commands/
+│   └── python-scaffold.md   # Command: project scaffolding
+└── skills/
+    ├── async-python-patterns/
+    ├── python-testing-patterns/
+    ├── python-packaging/
+    ├── python-performance-optimization/
+    └── uv-package-manager/
+```
+
+### plugin.json format
+
+Only `name` is required. Agents, commands, and skills are auto-discovered from the directory structure — no manual enumeration needed.
+
+```json
+{
+  "name": "python-development",
+  "version": "1.2.2",
+  "description": "Modern Python development with Python 3.12+, Django, FastAPI, async patterns, and production best practices",
+  "author": {
+    "name": "Seth Hobson",
+    "email": "seth@example.com"
+  },
+  "license": "MIT"
+}
+```
+
+### Agent frontmatter
+
+Each agent file opens with a YAML frontmatter block that controls its identity, behaviour, and model tier:
+
+```yaml
+---
+name: python-pro
+description: "Master Python 3.12+ with modern features, async programming, and production-ready practices. Use PROACTIVELY for Python development, optimization, or advanced Python patterns."
+model: opus
+color: blue          # optional — terminal display colour
+tools: Read, Grep    # optional — restricts available tools
+---
+```
+
+## Installing plugins
+
+### Step 1 — Add the marketplace
+
+Register the marketplace once. This makes all 77 plugins discoverable but loads **nothing** into your context:
+
+```bash
+/plugin marketplace add wshobson/agents
+```
+
+### Step 2 — Browse available plugins
+
+```bash
+/plugin
+```
+
+### Step 3 — Install only what you need
+
+```bash
+# Language development
+/plugin install python-development
+/plugin install javascript-typescript
+
+# Backend & APIs
+/plugin install backend-development
+
+# Infrastructure
+/plugin install kubernetes-operations
+/plugin install cloud-infrastructure
+
+# Security & quality
+/plugin install security-scanning
+/plugin install comprehensive-review
+
+# Full-stack orchestration
+/plugin install full-stack-orchestration
+```
+
+Each install loads **only that plugin's** agents, commands, and skills into Claude's context window.
+
+<Tip>
+Use the `@claude-code-workflows` suffix when the marketplace namespace is ambiguous:
+
+```bash
+/plugin install python-development@claude-code-workflows
+```
+</Tip>
+
+## Install-only-what-you-need philosophy
+
+The marketplace follows the Unix single-responsibility principle: every plugin does one thing well. The practical benefits are:
+
+- **Minimal token usage** — average 3.6 components per plugin; no unrelated resources loaded
+- **Composability** — mix and match plugins for any workflow without coupling
+- **Clear boundaries** — isolated changes; updating one plugin never breaks another
+- **Progressive disclosure** — skills load domain knowledge only when a trigger condition is met
+
+### Composing plugins for a full-stack workflow
+
+```
+/plugin install backend-development       # API design + architecture agents
+/plugin install unit-testing              # Test generation commands
+/plugin install security-scanning         # SAST + dependency scanning
+/plugin install cicd-automation           # Pipeline configuration
+/plugin install observability-monitoring  # Metrics, tracing, SLO
+```
+
+Then invoke the full workflow with a single command:
+
+```bash
+/full-stack-orchestration:full-stack-feature "user authentication with OAuth2"
+```
+
+## Troubleshooting
+
+**"Plugin not found"** — Use plugin names (e.g. `javascript-typescript`), not agent names (e.g. `typescript-pro`). Optionally append `@claude-code-workflows`.
+
+**Plugins not loading after update** — Clear the cache and reinstall:
+
+```bash
+rm -rf ~/.claude/plugins/cache/claude-code-workflows
+rm ~/.claude/plugins/installed_plugins.json
+```
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Plugin catalog" icon="grid" href="/plugins/catalog">
+    Browse all 77 plugins across 24 categories with install commands.
+  </Card>
+  <Card title="Agent overview" icon="robot" href="/agents/overview">
+    Learn how agents work, model tiers, and invocation patterns.
+  </Card>
+</CardGroup>

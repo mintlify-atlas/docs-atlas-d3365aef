@@ -1,97 +1,99 @@
 ---
-title: "Introduction"
-description: "Welcome to the new home for your documentation"
+title: "Claude Code Agents: AI-powered automation for developers"
+description: "182 specialized AI agents, 77 plugins, 149 skills, and 96 commands for intelligent automation and multi-agent orchestration in Claude Code."
 ---
 
-## Setting up
+Claude Code Agents is a production-ready marketplace of specialized AI agents, plugins, and skills for [Claude Code](https://docs.claude.com/en/docs/claude-code/overview). Install only what you need — each plugin loads a focused set of agents, commands, and knowledge into your context with minimal token overhead.
 
-Get your documentation site up and running in minutes.
-
-<Card
-  title="Start here"
-  icon="rocket"
-  href="/quickstart"
-  horizontal
->
-  Follow our three step quickstart guide.
-</Card>
-
-## Make it yours
-
-Design a docs site that looks great and empowers your users.
-
-<Columns cols={2}>
-  <Card
-    title="Edit locally"
-    icon="pen-to-square"
-    href="/development"
-  >
-    Edit your docs locally and preview them in real time.
+<CardGroup cols={2}>
+  <Card title="Quick Start" icon="rocket" href="/quickstart">
+    Add the marketplace and install your first plugin in two commands.
   </Card>
-  <Card
-    title="Customize your site"
-    icon="palette"
-    href="/essentials/settings"
-  >
-    Customize the design and colors of your site to match your brand.
+  <Card title="Plugin Catalog" icon="puzzle-piece" href="/plugins/catalog">
+    Browse all 77 plugins across 24 categories and find the right tools for your workflow.
   </Card>
-    <Card
-    title="Set up navigation"
-    icon="map"
-    href="/essentials/navigation"
-  >
-    Organize your docs to help users find what they need and succeed with your product.
+  <Card title="Agent Reference" icon="robot" href="/agents/catalog">
+    Explore 182 specialized agents organized by domain, language, and model tier.
   </Card>
-  <Card
-    title="API documentation"
-    icon="terminal"
-    href="/api-reference/introduction"
-  >
-    Auto-generate API documentation from OpenAPI specifications.
+  <Card title="Agent Skills" icon="brain" href="/skills/catalog">
+    Discover 149 modular skills that extend agent capabilities with progressive disclosure.
   </Card>
-</Columns>
+</CardGroup>
 
-## Create beautiful pages
+## What you get
 
-Everything you need to create world-class documentation.
+<CardGroup cols={3}>
+  <Card title="77 Plugins" icon="boxes-stacked">
+    Single-purpose plugins organized across 24 categories. Average 3.6 components each — focused and composable.
+  </Card>
+  <Card title="182 Agents" icon="users-gear">
+    Domain experts covering architecture, languages, infrastructure, security, AI/ML, and business operations.
+  </Card>
+  <Card title="149 Skills" icon="graduation-cap">
+    Modular knowledge packages with progressive disclosure — loaded only when needed.
+  </Card>
+  <Card title="16 Orchestrators" icon="diagram-project">
+    Multi-agent workflow coordinators for full-stack development, security hardening, ML pipelines, and more.
+  </Card>
+  <Card title="96 Commands" icon="terminal">
+    Slash commands for scaffolding, security scanning, test generation, and infrastructure setup.
+  </Card>
+  <Card title="3-Tier Model Strategy" icon="layer-group">
+    Opus, Sonnet, and Haiku assigned strategically — critical tasks get Opus, fast operations get Haiku.
+  </Card>
+</CardGroup>
 
-<Columns cols={2}>
-  <Card
-    title="Write with MDX"
-    icon="pen-fancy"
-    href="/essentials/markdown"
-  >
-    Use MDX to style your docs pages.
-  </Card>
-  <Card
-    title="Code samples"
-    icon="code"
-    href="/essentials/code"
-  >
-    Add sample code to demonstrate how to use your product.
-  </Card>
-  <Card
-    title="Images"
-    icon="image"
-    href="/essentials/images"
-  >
-    Display images and other media.
-  </Card>
-  <Card
-    title="Reusable snippets"
-    icon="recycle"
-    href="/essentials/reusable-snippets"
-  >
-    Write once and reuse across your docs.
-  </Card>
-</Columns>
+## Get started in two steps
 
-## Need inspiration?
+<Steps>
+  <Step title="Add the marketplace">
+    Register the full catalog of 77 plugins in Claude Code. This loads no agents or tools into your context yet.
 
-<Card
-  title="See complete examples"
-  icon="stars"
-  href="https://mintlify.com/customers"
->
-  Browse our showcase of exceptional documentation sites.
-</Card>
+    ```bash
+    /plugin marketplace add wshobson/agents
+    ```
+  </Step>
+  <Step title="Install the plugins you need">
+    Each installed plugin loads only its specific agents, commands, and skills.
+
+    ```bash
+    /plugin install python-development
+    /plugin install backend-development
+    /plugin install security-scanning
+    ```
+  </Step>
+</Steps>
+
+## Popular workflows
+
+<CardGroup cols={2}>
+  <Card title="Full-stack feature development" icon="layer-group" href="/workflows/multi-agent">
+    Coordinate 7+ agents across backend, frontend, testing, security, and deployment in a single command.
+  </Card>
+  <Card title="Security hardening" icon="shield-halved" href="/guides/security-hardening">
+    Multi-agent SAST, dependency scanning, and code review with OWASP coverage.
+  </Card>
+  <Card title="Kubernetes deployment" icon="cloud" href="/guides/kubernetes-deployment">
+    Production-grade manifests, Helm charts, and GitOps workflows with 4 specialized skills.
+  </Card>
+  <Card title="TDD workflows" icon="vial" href="/guides/backend-development">
+    Red-green-refactor cycle automation with test generation and code review.
+  </Card>
+</CardGroup>
+
+## Explore the docs
+
+<CardGroup cols={2}>
+  <Card title="Core concepts" icon="book" href="/concepts">
+    Understand plugins, agents, skills, and how they compose into workflows.
+  </Card>
+  <Card title="Architecture" icon="sitemap" href="/architecture/design-principles">
+    Learn the design principles behind granular, composable plugin architecture.
+  </Card>
+  <Card title="Multi-agent workflows" icon="arrows-split-up-and-left" href="/workflows/multi-agent">
+    Pre-configured orchestration patterns for complex development operations.
+  </Card>
+  <Card title="Contributing" icon="code-pull-request" href="/contributing/adding-plugins">
+    Add your own plugins, agents, and skills to the marketplace.
+  </Card>
+</CardGroup>

@@ -1,0 +1,136 @@
+---
+title: "Design principles behind Claude Code Agents"
+description: "How Claude Code Agents applies single responsibility, composability, context efficiency, and progressive disclosure across 77 plugins."
+---
+
+Claude Code Agents is built around a set of deliberate architectural choices that prioritize minimal token usage, clear separation of concerns, and flexible composition over monolithic bundling. The 77 plugins in the marketplace each reflect these principles: focused, composable, and designed to load only what a given task actually needs.
+
+## Core Design Principles
+
+### Single Responsibility Principle
+
+Every plugin does exactly one thing well. This is the Unix philosophy applied to AI tooling: a plugin named `security-scanning` handles security, `python-development` handles Python, and `kubernetes-operations` handles Kubernetes — nothing more, nothing less.
+
+The average plugin contains **3.6 components** (agents, commands, and skills combined), which falls squarely within Anthropic's recommended 2–8 pattern for Claude Code plugins. Zero plugins are bloated or multi-purpose.
+
+The practical benefit is immediate: when you install `python-development`, you load 3 Python agents, 1 scaffolding command, and 16 skills — roughly 1,000 tokens of context. Not the entire 182-agent marketplace.
+
+### Composability Over Bundling
+
+Rather than shipping one large plugin that attempts to handle every scenario, the architecture favors small, focused plugins that can be mixed and matched. Workflow orchestrators exist specifically to coordinate across plugins without forcing users to take on unneeded capabilities.
+
+This means you can combine `backend-development` + `security-scanning` + `unit-testing` + `comprehensive-review` for a full feature development workflow, or use only `security-scanning` for a focused security audit — installing each plugin independently.
+
+### Context Efficiency
+
+Smaller tools produce faster responses and more accurate outputs. When an agent only has access to the knowledge it needs for the current task, it performs better than if it were loaded with hundreds of irrelevant instructions.
+
+This is the driving reason behind granular plugin structure:
+
+- **Isolated plugins** load only task-relevant agents and commands
+- **Progressive disclosure via skills** loads domain knowledge on demand, not upfront
+- **Clear plugin boundaries** prevent context pollution between domains
+
+### Maintainability
+
+Single-purpose plugins are vastly easier to update. When the FastAPI ecosystem changes, only `python-development` needs updating — not a monolithic "all-languages" plugin. Skills can be updated independently. Agents can be added or removed without breaking unrelated workflows.
+
+Isolated dependencies mean a change to the Kubernetes plugin cannot inadvertently affect how the Python plugin behaves.
+
+## Design Patterns
+
+The marketplace uses four recurring structural patterns, each suited to a different level of complexity.
+
+### Pattern 1: Single-Purpose Plugin
+
+The foundational pattern. One domain, one directory, focused components.
+
+```
+python-development/
+├── agents/           # Python language experts (python-pro, django-pro, fastapi-pro)
+├── commands/         # Python project scaffolding
+└── skills/           # Python-specific knowledge packages
+```
+
+**Benefits:**
+- Clear, single responsibility
+- Minimal token footprint when installed
+- Easy to maintain and update independently
+- Composable with any other plugin
+
+### Pattern 2: Workflow Orchestration
+
+Orchestrator plugins coordinate multiple specialized agents without bundling them. The orchestrator itself is lean — its power comes from the agents it directs.
+
+```
+full-stack-orchestration/
+└── commands/
+    └── full-stack-feature.md    # Coordinates 7+ agents across plugins
+```
+
+The `full-stack-feature` command sequences the following agents in order:
+
+1. `backend-architect` — designs the API contract
+2. `database-architect` — designs the data schema
+3. `frontend-developer` — implements the UI
+4. `test-automator` — creates the test suite
+5. `security-auditor` — performs security review
+6. `deployment-engineer` — sets up CI/CD
+7. `observability-engineer` — configures monitoring
+
+Each agent comes from its own plugin. The orchestrator references them — it doesn't duplicate them.
+
+### Pattern 3: Agent + Skill Integration
+
+Agents handle reasoning and orchestration; skills supply specialized knowledge. This separation keeps agents lean while enabling deep domain expertise on demand.
+
+```
+User: "Build FastAPI project with async patterns"
+  ↓
+fastapi-pro agent (orchestrates the task)
+  ↓
+async-python-patterns skill (provides concurrency knowledge)
+  ↓
+python-scaffold command (generates the project files)
+```
+
+The `async-python-patterns` skill is only loaded into context when the agent determines it is relevant. If the user asks about something unrelated to async, that knowledge never consumes tokens.
+
+### Pattern 4: Multi-Plugin Composition
+
+For complex workflows, multiple installed plugins work together. Each plugin stays isolated; the composition happens at the command invocation level.
+
+```
+Feature Development Workflow:
+1. backend-development:feature-development   # Design and implement
+2. security-scanning:security-hardening      # Security review
+3. unit-testing:test-generate                # Test generation
+4. comprehensive-review:full-review          # Multi-perspective review
+5. cicd-automation:workflow-automate         # Pipeline setup
+6. observability-monitoring:monitor-setup    # Monitoring configuration
+```
+
+Each step uses a different plugin. You install only the plugins relevant to your workflow.
+
+<Note>
+  Composing plugins this way means token usage scales with what you install — not with the size of the entire marketplace. A developer who only installs `python-development` and `unit-testing` loads only those two plugins' contexts.
+</Note>
+
+## Progressive Disclosure (Skills)
+
+Skills implement a three-tier architecture to deliver deep knowledge without upfront token cost:
+
+1. **Metadata** — Name and activation criteria, always loaded with the plugin
+2. **Instructions** — Core guidance and patterns, loaded when the skill is activated
+3. **Resources** — Examples, templates, and reference material, loaded on demand
+
+This means a plugin with 16 skills (like `python-development`) doesn't load all 16 skills' full content at install time. Only the frontmatter metadata for each skill is loaded. The full content of a skill — which can run to hundreds of lines — only enters context when a user's query triggers that skill's activation criteria.
+
+<CardGroup cols={2}>
+  <Card title="Model Strategy" href="/architecture/model-strategy">
+    How Opus, Sonnet, and Haiku are assigned across 182 agents
+  </Card>
+  <Card title="Plugin Structure" href="/architecture/plugin-structure">
+    The complete anatomy of a Claude Code plugin
+  </Card>
+</CardGroup>

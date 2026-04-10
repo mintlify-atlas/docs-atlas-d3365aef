@@ -1,0 +1,144 @@
+---
+title: "Workflows and commands: automate development tasks"
+description: "Learn how to use Claude Code Agents workflows and slash commands to automate development, testing, security, and deployment operations."
+---
+
+Workflows in Claude Code Agents give you two complementary interfaces for driving the 77 plugins and 182 specialized agents: **slash commands** for direct, structured invocation and **natural language** for flexible, context-driven orchestration. Whether you are scaffolding a new project, triggering a multi-agent security audit, or asking Claude to reason about which specialist to bring in, both paths tap the same underlying agent ecosystem.
+
+## Slash command syntax
+
+Every installed plugin exposes its commands under a shared namespace:
+
+```bash
+/plugin-name:command-name [arguments]
+```
+
+Arguments are passed after the command name. Many commands accept flags for precise control:
+
+```bash
+# Scaffold a FastAPI microservice
+/python-development:python-scaffold fastapi-microservice
+
+# Full-stack feature with a specific API style
+/full-stack-orchestration:full-stack-feature "user dashboard" --api-style graphql
+
+# Security hardening scoped to a compliance framework
+/security-scanning:security-hardening --depth comprehensive --compliance owasp,pci-dss
+```
+
+## Discovering commands
+
+List every command made available by your installed plugins:
+
+```bash
+/plugin
+```
+
+This shows the full command namespace across all active plugins — useful when exploring a new plugin or looking up exact argument syntax.
+
+## Two invocation styles
+
+<Tabs>
+  <Tab title="Slash commands">
+    Slash commands give you direct, deterministic control. You choose the exact workflow, supply the arguments, and the agent chain executes in the defined order. This is best for repeatable processes, CI-style automation, and any task where you want structured parameters.
+
+    ```bash
+    # Generate unit tests for a specific file
+    /unit-testing:test-generate src/api/users.py
+
+    # Run a TDD red-green-refactor cycle
+    /tdd-workflows:tdd-red "User can reset password"
+    /tdd-workflows:tdd-green
+    /tdd-workflows:tdd-refactor
+
+    # Launch a full security assessment
+    /security-scanning:security-hardening --depth comprehensive
+    ```
+
+    Benefits of slash commands:
+
+    - **Direct invocation** — no need to describe the operation in prose
+    - **Structured arguments** — pass parameters explicitly for precise control
+    - **Composability** — chain commands together across plugins for complex workflows
+    - **Discoverability** — use `/plugin` to browse everything available
+  </Tab>
+  <Tab title="Natural language">
+    Natural language lets Claude reason about which agents and skills to activate. Describe your intent and Claude Code selects the appropriate specialists, coordinates them, and applies relevant skills automatically.
+
+    ```
+    "Use backend-architect to design the authentication API"
+    "Have security-auditor scan for OWASP vulnerabilities"
+    "Get performance-engineer to optimize this database query"
+    "Implement a user dashboard with real-time analytics"
+    ```
+
+    You can also mix approaches — start a command-based workflow and then provide natural language guidance to refine it:
+
+    ```bash
+    # Start with a structured workflow
+    /full-stack-orchestration:full-stack-feature "payment processing"
+
+    # Then guide it with natural language
+    "Ensure PCI-DSS compliance and integrate with Stripe"
+    "Add retry logic for failed transactions"
+    "Set up fraud detection rules"
+    ```
+
+    Benefits of natural language:
+
+    - **Exploratory work** — useful when you are unsure which tool fits best
+    - **Complex reasoning** — Claude coordinates multiple agents based on context
+    - **Contextual decisions** — the right approach adapts to the situation
+    - **Ad-hoc tasks** — one-off operations that do not map to a single command
+  </Tab>
+</Tabs>
+
+## When to use each approach
+
+| Situation | Recommended approach |
+|---|---|
+| Structured, multi-step workflows | Slash commands |
+| Repetitive tasks you run frequently | Slash commands |
+| Precise control with explicit parameters | Slash commands |
+| Exploratory or open-ended work | Natural language |
+| Coordinating multiple agents contextually | Natural language |
+| One-off operations | Natural language |
+
+## Workflow composition
+
+The real power comes from combining multiple plugins in sequence. Each command output informs the next step:
+
+```bash
+# 1. Develop the feature
+/backend-development:feature-development payment processing API
+
+# 2. Harden security
+/security-scanning:security-hardening
+
+# 3. Generate tests
+/unit-testing:test-generate
+
+# 4. Review the implementation
+/comprehensive-review:full-review
+
+# 5. Set up CI/CD
+/cicd-automation:workflow-automate
+
+# 6. Add monitoring
+/observability-monitoring:monitor-setup
+```
+
+<Tip>
+  Agent skills activate automatically alongside commands. When you run `/python-development:python-scaffold fastapi-microservice`, the `async-python-patterns`, `python-testing-patterns`, and `uv-package-manager` skills load to guide the output — without any extra steps on your part.
+</Tip>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Command reference" icon="terminal" href="/workflows/commands">
+    Browse all 96 slash commands organized by category with full argument syntax.
+  </Card>
+  <Card title="Multi-agent orchestration" icon="diagram-project" href="/workflows/multi-agent">
+    Learn how workflow orchestrators coordinate specialist agents for complex operations.
+  </Card>
+</CardGroup>

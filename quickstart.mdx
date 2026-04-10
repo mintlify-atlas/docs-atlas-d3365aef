@@ -1,80 +1,174 @@
 ---
-title: "Quickstart"
-description: "Start building awesome documentation in minutes"
+title: "Quickstart: install Claude Code Agents in two steps"
+description: "Add the wshobson/agents marketplace to Claude Code, install your first plugin, and run your first slash command in under two minutes."
 ---
 
-## Get started in three steps
+Claude Code Agents works through Claude Code's plugin system. You register the marketplace once, then install individual plugins on demand. Each installed plugin loads only its own agents, commands, and skills — nothing else touches your context.
 
-Get your documentation site running locally and make your first customization.
+<Steps>
+  <Step title="Add the marketplace">
+    Register the `wshobson/agents` marketplace with Claude Code. This makes all 77 plugins discoverable but does **not** load any agents or tools into your context yet.
 
-### Step 1: Set up your local environment
+    ```bash
+    /plugin marketplace add wshobson/agents
+    ```
+
+    You only need to do this once per Claude Code installation.
+  </Step>
+
+  <Step title="Browse available plugins">
+    List all plugins available from installed marketplaces:
+
+    ```bash
+    /plugin
+    ```
+
+    This shows every plugin along with its included agents and commands. Use this to discover what's available before committing to an install.
+  </Step>
+
+  <Step title="Install the plugins you need">
+    Install plugins by name. Each plugin loads only its own components.
+
+    ```bash
+    # Language development
+    /plugin install python-development          # 3 agents, 1 command, 16 skills
+    /plugin install javascript-typescript       # 2 agents, 1 command, 4 skills
+    /plugin install backend-development         # 3 agents, 1 command, 3 skills
+
+    # Infrastructure & operations
+    /plugin install kubernetes-operations       # 1 agent, 1 command, 4 skills
+    /plugin install cloud-infrastructure        # cloud agents + 4 skills
+
+    # Security & quality
+    /plugin install security-scanning           # 1 agent, 3 commands, 1 skill
+    /plugin install comprehensive-review        # 3 agents, 2 commands
+
+    # Multi-agent orchestration
+    /plugin install full-stack-orchestration    # coordinates 7+ agents
+    ```
+
+    <Note>
+      You install **plugins**, not agents directly. Agents are bundled inside plugins. See [plugins vs agents](#plugins-vs-agents) below.
+    </Note>
+  </Step>
+
+  <Step title="Use commands and agents">
+    Once a plugin is installed, its slash commands and agents are immediately available.
+
+    **Slash commands** use the format `/plugin-name:command-name`:
+
+    ```bash
+    # Scaffold a FastAPI microservice
+    /python-development:python-scaffold fastapi-microservice
+
+    # Run a full security audit
+    /security-scanning:security-hardening --depth comprehensive
+
+    # Generate unit tests for a file
+    /unit-testing:test-generate src/api/users.py
+
+    # Kick off a full-stack feature workflow
+    /full-stack-orchestration:full-stack-feature "user authentication with OAuth2"
+
+    # Run a TDD red-green-refactor cycle
+    /tdd-workflows:tdd-red "user can reset password"
+    /tdd-workflows:tdd-green
+    /tdd-workflows:tdd-refactor
+    ```
+
+    **Natural language** also works — Claude Code selects the right agent automatically:
+
+    ```
+    "Use backend-architect to design the authentication API"
+    "Have security-auditor scan for OWASP vulnerabilities"
+    "Create a Kubernetes deployment with Helm chart and GitOps"
+    ```
+  </Step>
+</Steps>
+
+## Plugins vs agents
+
+You install **plugins**. Agents are bundled inside them. You cannot install an agent directly.
+
+| Plugin | Agents bundled |
+|---|---|
+| `comprehensive-review` | `architect-review`, `code-reviewer`, `security-auditor` |
+| `javascript-typescript` | `javascript-pro`, `typescript-pro` |
+| `python-development` | `python-pro`, `django-pro`, `fastapi-pro` |
+| `blockchain-web3` | `blockchain-developer` |
+
+```bash
+# Wrong — agent names are not valid plugin identifiers
+/plugin install typescript-pro
+
+# Correct — install the plugin that contains the agent
+/plugin install javascript-typescript
+```
+
+If you see a `@claude-code-workflows` suffix in documentation or error messages, include it:
+
+```bash
+/plugin install javascript-typescript@claude-code-workflows
+```
+
+## Workflow composition
+
+Plugins are designed to be composed. A common pattern for backend feature development:
+
+```bash
+# 1. Build the feature
+/backend-development:feature-development "payment processing API"
+
+# 2. Harden security
+/security-scanning:security-hardening
+
+# 3. Generate tests
+/unit-testing:test-generate
+
+# 4. Review the implementation
+/comprehensive-review:full-review
+
+# 5. Set up CI/CD
+/cicd-automation:workflow-automate
+
+# 6. Add monitoring
+/observability-monitoring:monitor-setup
+```
+
+## Troubleshooting
 
 <AccordionGroup>
-  <Accordion icon="copy" title="Clone your docs locally">
-    During the onboarding process, you created a GitHub repository with your docs content if you didn't already have one. You can find a link to this repository in your [dashboard](https://dashboard.mintlify.com).
-    
-    To clone the repository locally so that you can make and preview changes to your docs, follow the [Cloning a repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) guide in the GitHub docs.
+  <Accordion title='"Plugin not found" error'>
+    You are likely using an agent name instead of a plugin name. Refer to the [plugin catalog](/plugins/catalog) for the correct plugin name, or append `@claude-code-workflows` to the plugin name:
+
+    ```bash
+    /plugin install python-development@claude-code-workflows
+    ```
   </Accordion>
-  <Accordion icon="rectangle-terminal" title="Start the preview server">
-    1. Install the Mintlify CLI: `npm i -g mint`
-    2. Navigate to your docs directory and run: `mint dev`
-    3. Open `http://localhost:3000` to see your docs live!
-    
-    <Tip>Your preview updates automatically as you edit files.</Tip>
+
+  <Accordion title="Plugins not loading after install">
+    Clear the plugin cache and reinstall:
+
+    ```bash
+    rm -rf ~/.claude/plugins/cache/claude-code-workflows
+    rm ~/.claude/plugins/installed_plugins.json
+    ```
+
+    Then re-run your `/plugin install` commands.
   </Accordion>
-</AccordionGroup>
 
-### Step 2: Deploy your changes
-
-<AccordionGroup>
-  <Accordion icon="github" title="Install our GitHub app">
-    Install the Mintlify GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app).
-    
-    Our GitHub app automatically deploys your changes to your docs site, so you don't need to manage deployments yourself.
-</Accordion>
-<Accordion icon="palette" title="Update your site name and colors">
-    For a first change, let's update the name and colors of your docs site.
-
-    1. Open `docs.json` in your editor.
-    2. Change the `"name"` field to your project name.
-    3. Update the `"colors"` to match your brand.
-    4. Save and see your changes instantly at `http://localhost:3000`.
-
-    <Tip>Try changing the primary color to see an immediate difference!</Tip>
+  <Accordion title="How do I know which agents are available?">
+    Run `/plugin` to list all installed plugins and their components. Each entry shows the agents, commands, and skills bundled with that plugin.
   </Accordion>
 </AccordionGroup>
-
-### Step 3: Go live
-
-<Accordion icon="rocket" title="Publish your docs">
-  1. Commit and push your changes.
-  2. Your docs will update and be live in moments!
-</Accordion>
 
 ## Next steps
 
-Now that you have your docs running, explore these key features:
-
 <CardGroup cols={2}>
-
-<Card title="Write Content" icon="pen-to-square" href="/essentials/markdown">
-  Learn MDX syntax and start writing your documentation.
-</Card>
-
-<Card title="Customize style" icon="palette" href="/essentials/settings">
-  Make your docs match your brand perfectly.
-</Card>
-
-<Card title="Add code examples" icon="square-code" href="/essentials/code">
-  Include syntax-highlighted code blocks.
-</Card>
-
-<Card title="API documentation" icon="code" href="/api-reference/introduction">
-  Auto-generate API docs from OpenAPI specs.
-</Card>
-
+  <Card title="Plugin catalog" icon="puzzle-piece" href="/plugins/catalog">
+    Browse all 77 plugins across 24 categories to find the right tools for your stack.
+  </Card>
+  <Card title="Agent catalog" icon="robot" href="/agents/catalog">
+    See all 182 agents, their model tiers, and which plugins contain them.
+  </Card>
 </CardGroup>
-
-<Note>
-  **Need help?** See our [full documentation](https://mintlify.com/docs) or join our [community](https://mintlify.com/community).
-</Note>

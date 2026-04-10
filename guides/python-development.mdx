@@ -1,0 +1,170 @@
+---
+title: "Python development with FastAPI, Django, and UV"
+description: "Build production Python applications using Claude Code Agents' Python plugin with FastAPI, Django, async patterns, and UV package management skills."
+---
+
+The Python development plugin provides three specialized agents covering general Python 3.12+, Django, and FastAPI, along with a scaffolding command that generates complete project structures and sixteen skills covering async patterns, testing, packaging, performance optimization, and modern tooling. Installing the plugin loads approximately 1,000 tokens of context — only the agents and skill metadata — while the full skill content is loaded progressively when relevant.
+
+## Install the plugin
+
+```bash
+/plugin marketplace add wshobson/agents
+/plugin install python-development
+```
+
+## Scaffold a new project
+
+The `python-scaffold` command generates a production-ready project structure from a single description. It detects the project type from your input and initializes everything with `uv`:
+
+```bash
+/python-development:python-scaffold fastapi-microservice
+/python-development:python-scaffold django-api
+/python-development:python-scaffold python-library
+/python-development:python-scaffold cli-tool
+```
+
+<Steps>
+  <Step title="Detect project type">
+    The command infers the project type — FastAPI, Django, library, CLI, or generic — from the argument you provide.
+  </Step>
+  <Step title="Initialize with uv">
+    The project is initialized with `uv init`, a git repository is created, a `.venv` is set up, and a `.gitignore` is populated with standard Python exclusions.
+
+    ```bash
+    uv init fastapi-microservice
+    uv venv
+    uv sync
+    ```
+  </Step>
+  <Step title="Generate project structure">
+    For a FastAPI project, the scaffold creates a `src/` layout with versioned API routers, a config module, Pydantic-based models and schemas, a service layer, and a `tests/` directory with `conftest.py`.
+
+    ```
+    fastapi-microservice/
+    ├── pyproject.toml
+    ├── .env.example
+    ├── Makefile
+    └── src/
+        └── project_name/
+            ├── main.py
+            ├── config.py
+            ├── api/v1/endpoints/
+            ├── core/
+            ├── models/
+            ├── schemas/
+            └── services/
+    ```
+  </Step>
+  <Step title="Configure modern tooling">
+    `pyproject.toml` is populated with `ruff` for linting and formatting (replacing black, isort, and flake8), `pytest-asyncio` for async test support, and `httpx` for testing async endpoints. A `Makefile` provides `install`, `dev`, `test`, `lint`, and `format` targets.
+  </Step>
+  <Step title="Write entry point and health check">
+    `main.py` is generated with a working FastAPI app, CORS middleware, API router registration from config, and a `/health` endpoint.
+
+    ```python
+    @app.get("/health")
+    async def health_check() -> dict[str, str]:
+        return {"status": "healthy"}
+    ```
+  </Step>
+</Steps>
+
+## Agents in this plugin
+
+<CardGroup cols={2}>
+  <Card title="python-pro" icon="python">
+    Python 3.12+ generalist. Covers modern async/await patterns, `uv` and `ruff` tooling, Pydantic v2 data validation, SQLAlchemy 2.0+ async ORM, performance profiling with `cProfile` and `py-spy`, and advanced typing with Protocols and generics. Runs on Sonnet.
+  </Card>
+  <Card title="django-pro" icon="server">
+    Django 5.x specialist. Covers async views and ORM, class-based and function-based views, the admin interface, Django REST Framework, Channels for WebSockets, `pytest-django`, and deployment with Gunicorn. Runs on Sonnet.
+  </Card>
+  <Card title="fastapi-pro" icon="bolt">
+    FastAPI specialist. Covers dependency injection, background tasks, async SQLAlchemy, Alembic migrations, Pydantic settings management, JWT authentication, and OpenAPI documentation generation. Runs on Sonnet.
+  </Card>
+</CardGroup>
+
+## Skills and progressive disclosure
+
+The Python plugin ships with sixteen skills. Their metadata (name and activation criteria) is always loaded; the full content is only injected into context when the skill activates. This keeps baseline token usage low while giving agents access to deep expertise on demand.
+
+Five core skills activate for most Python work:
+
+| Skill | Activates when... |
+|---|---|
+| `async-python-patterns` | AsyncIO, concurrent programming, or async/await patterns are mentioned |
+| `python-testing-patterns` | Setting up pytest, writing fixtures, or mocking external services |
+| `python-packaging` | Creating distributable packages, configuring `pyproject.toml`, or publishing to PyPI |
+| `python-performance-optimization` | Profiling, bottleneck analysis, or optimization is the goal |
+| `uv-package-manager` | Dependency management, virtual environments, or `uv` commands come up |
+
+Eleven additional skills activate for more specific scenarios: `python-anti-patterns`, `python-background-jobs`, `python-code-style`, `python-configuration`, `python-design-patterns`, `python-error-handling`, `python-observability`, `python-project-structure`, `python-resilience`, `python-resource-management`, and `python-type-safety`.
+
+<Note>
+  Skills use three-tier progressive disclosure: **metadata** (always loaded), **instructions** (loaded on activation), and **resources** such as templates and examples (loaded on demand). You never pay the token cost of a skill you are not using.
+</Note>
+
+## Usage examples
+
+<Tabs>
+  <Tab title="FastAPI">
+    ```bash
+    # Scaffold a new microservice
+    /python-development:python-scaffold fastapi-microservice
+
+    # Natural language for implementation work
+    "Use fastapi-pro to implement JWT authentication with refresh tokens"
+    "Have fastapi-pro add rate limiting middleware using slowapi"
+    "Use python-pro to optimize this async endpoint — it's hitting N+1 queries"
+    ```
+  </Tab>
+  <Tab title="Django">
+    ```bash
+    # Scaffold a Django API project
+    /python-development:python-scaffold django-api
+
+    # Natural language for Django work
+    "Use django-pro to add async views for the orders app"
+    "Have django-pro configure Django Channels for real-time notifications"
+    "Use django-pro to set up pytest-django with factory_boy fixtures"
+    ```
+  </Tab>
+  <Tab title="Libraries and CLIs">
+    ```bash
+    # Scaffold a publishable library
+    /python-development:python-scaffold python-library
+
+    # Scaffold a CLI tool
+    /python-development:python-scaffold cli-tool
+
+    # Packaging and distribution
+    "Use python-pro to configure hatchling and publish this package to PyPI"
+    "Have python-pro add Typer and Rich to create a polished CLI interface"
+    ```
+  </Tab>
+</Tabs>
+
+## Composing with other plugins
+
+```bash
+# After scaffolding, run TDD workflows for your first feature
+/plugin install tdd-workflows
+/tdd-workflows:tdd-red "User registration validates unique email address"
+/tdd-workflows:tdd-green
+/tdd-workflows:tdd-refactor
+
+# Orchestrate a complete full-stack Python feature
+/plugin install full-stack-orchestration
+/full-stack-orchestration:full-stack-feature "user authentication with OAuth2" --stack react/fastapi/postgres
+
+# Security audit of the FastAPI app
+/plugin install security-scanning
+/security-scanning:security-hardening
+
+# Set up Kubernetes deployment for the microservice
+/plugin install kubernetes-operations
+"Create production Kubernetes deployment with Helm chart and GitOps for this FastAPI service"
+```
+
+<Tip>
+  The `api-scaffolding` plugin (installed separately) adds a `fastapi-templates` skill and dedicated `django-pro` and `fastapi-pro` agents with tighter framework focus. Install it alongside `python-development` when you are building exclusively with one of those frameworks.
+</Tip>

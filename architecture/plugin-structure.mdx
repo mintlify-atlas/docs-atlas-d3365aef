@@ -1,0 +1,248 @@
+---
+title: "Plugin structure: anatomy of a Claude Code plugin"
+description: "Learn the complete file structure of a Claude Code plugin including agents, commands, skills, plugin.json, and marketplace.json configuration."
+---
+
+A Claude Code plugin is a directory containing markdown files — agents, commands, and skills — along with a minimal JSON configuration. The Claude Code runtime auto-discovers all components from the directory structure, so there's no manual registration of individual files. Understanding this structure is the foundation for both using the marketplace effectively and contributing new plugins.
+
+## Complete Plugin Directory Layout
+
+Every plugin lives under `plugins/` and follows this layout:
+
+```
+plugins/<plugin-name>/
+├── .claude-plugin/
+│   └── plugin.json          # Plugin identity (only "name" is required)
+├── agents/
+│   └── <agent-name>.md      # One file per agent
+├── commands/
+│   └── <command-name>.md    # One file per command
+└── skills/
+    └── <skill-name>/
+        ├── SKILL.md          # Required — frontmatter + skill content
+        ├── references/       # Optional — supporting material
+        │   └── *.md
+        └── assets/           # Optional — templates, configs
+```
+
+All three subdirectories (`agents/`, `commands/`, `skills/`) are optional. A valid plugin needs at least one agent or one command. Skills are always optional.
+
+## plugin.json
+
+The `.claude-plugin/plugin.json` file identifies the plugin. Only `name` is required — agents, commands, and skills are auto-discovered from the directory structure.
+
+```json
+{ "name": "plugin-name" }
+```
+
+In practice, published plugins include additional metadata:
+
+```json
+{
+  "name": "python-development",
+  "version": "1.2.2",
+  "description": "Modern Python development with Python 3.12+, Django, FastAPI, async patterns, and production best practices",
+  "author": {
+    "name": "Seth Hobson",
+    "email": "seth@major7apps.com"
+  },
+  "license": "MIT"
+}
+```
+
+<Note>
+  The `name` field in `plugin.json` is what users reference when running `/plugin install <name>`. It must match the name registered in `marketplace.json`.
+</Note>
+
+## marketplace.json
+
+The root `.claude-plugin/marketplace.json` file is the registry for all plugins in the marketplace. It tells Claude Code what plugins exist, where their source lives, and metadata about each one.
+
+```json
+{
+  "name": "claude-code-workflows",
+  "owner": {
+    "name": "Seth Hobson",
+    "email": "seth@major7apps.com",
+    "url": "https://github.com/wshobson"
+  },
+  "metadata": {
+    "description": "Production-ready workflow orchestration with 77 focused plugins, 182 specialized agents, and 149 skills",
+    "version": "1.5.7"
+  },
+  "plugins": [
+    {
+      "name": "python-development",
+      "source": "./plugins/python-development",
+      "description": "Modern Python development with Python 3.12+, Django, FastAPI, async patterns",
+      "version": "1.2.2",
+      "author": {
+        "name": "Seth Hobson",
+        "email": "seth@major7apps.com"
+      },
+      "homepage": "https://github.com/wshobson/agents",
+      "license": "MIT",
+      "category": "languages"
+    }
+  ]
+}
+```
+
+The `source` field points to the plugin directory relative to the marketplace root. Agents are referenced as `./agents/name.md`; skills are referenced as `./skills/skill-name` (the directory path, not `SKILL.md` directly).
+
+## Agent Frontmatter
+
+Each file in `agents/` is a markdown file with a YAML frontmatter block followed by the agent's system prompt.
+
+```yaml
+---
+name: agent-name
+description: "What this agent does. Use PROACTIVELY when [trigger conditions]."
+model: opus|sonnet|haiku|inherit
+color: blue|green|red|yellow|cyan|magenta  # optional
+tools: Read, Grep, Glob                    # optional — restricts available tools
+---
+```
+
+**Field reference:**
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `name` | Yes | Hyphen-case identifier used to invoke the agent |
+| `description` | Yes | What the agent does; must include "Use PROACTIVELY when" trigger conditions |
+| `model` | Yes | One of `opus`, `sonnet`, `haiku`, or `inherit` |
+| `color` | No | UI color hint for the agent card |
+| `tools` | No | Comma-separated list to restrict tool access |
+
+**Real example** from `python-development/agents/python-pro.md`:
+
+```yaml
+---
+name: python-pro
+description: Master Python 3.12+ with modern features, async programming, performance optimization, and production-ready practices. Expert in the latest Python ecosystem including uv, ruff, pydantic, and FastAPI. Use PROACTIVELY for Python development, optimization, or advanced Python patterns.
+model: opus
+---
+```
+
+## Command Frontmatter
+
+Each file in `commands/` is a markdown file containing a slash command definition. Commands are invoked as `/<plugin-name>:<command-name>`.
+
+```yaml
+---
+description: What this command does
+argument-hint: <path> [--flag]
+---
+```
+
+**Field reference:**
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `description` | Yes | One-line description shown in the command picker |
+| `argument-hint` | No | Usage hint displayed alongside the command |
+
+The body of the command file is the prompt template. Use `$ARGUMENTS` as a placeholder for user-provided arguments:
+
+```markdown
+---
+description: Scaffold a new Python project with modern tooling
+argument-hint: <project-type> [project-name]
+---
+
+# Python Project Scaffolding
+
+## Requirements
+
+$ARGUMENTS
+
+## Instructions
+
+Analyze the project type and generate a complete project structure...
+```
+
+## Skill Structure
+
+Skills live in `skills/<skill-name>/` and always contain a `SKILL.md` file. Supporting material goes in `references/` and templates or configs go in `assets/`.
+
+```
+skills/async-python-patterns/
+├── SKILL.md              # Required
+├── references/           # Optional
+│   └── asyncio-guide.md
+└── assets/               # Optional
+    └── async-template.py
+```
+
+**Skill frontmatter:**
+
+```yaml
+---
+name: skill-name
+description: "Use this skill when [specific trigger conditions]."
+---
+```
+
+The description field is especially important for skills — it is the only content loaded into context when the plugin is installed. The full skill content only loads when the trigger conditions are matched. This is the progressive disclosure architecture that keeps token usage minimal.
+
+**Real example** from `python-development/skills/async-python-patterns/SKILL.md`:
+
+```yaml
+---
+name: async-python-patterns
+description: Master Python asyncio, concurrent programming, and async/await patterns for high-performance applications. Use when building async APIs, concurrent systems, or I/O-bound applications requiring non-blocking operations.
+---
+```
+
+<Tip>
+  The description must be under 1,024 characters and should follow the pattern `"Use when [trigger conditions]."` — this is what the Claude Code runtime uses to decide whether to activate the skill for a given user query.
+</Tip>
+
+## Complete Example Plugin: kubernetes-operations
+
+This is the canonical example of a well-structured plugin from the architecture documentation:
+
+```
+plugins/kubernetes-operations/
+├── .claude-plugin/
+│   └── plugin.json
+├── agents/
+│   └── kubernetes-architect.md   # K8s architecture and design
+├── commands/
+│   └── k8s-deploy.md             # Deployment automation
+└── skills/
+    ├── k8s-manifest-generator/    # Manifest creation skill
+    │   └── SKILL.md
+    ├── helm-chart-scaffolding/    # Helm chart templates
+    │   └── SKILL.md
+    ├── gitops-workflow/           # GitOps automation patterns
+    │   └── SKILL.md
+    └── k8s-security-policies/    # Security policy guidance
+        └── SKILL.md
+```
+
+When a user installs `kubernetes-operations`:
+
+- The `kubernetes-architect` agent is loaded into context
+- The `k8s-deploy` command becomes available as `/kubernetes-operations:k8s-deploy`
+- The **metadata only** for all 4 skills is loaded (activation criteria, ~50 tokens each)
+- Full skill content loads on demand when the agent determines it is relevant
+
+## Auto-Discovery
+
+Claude Code's plugin runtime discovers components automatically from the directory structure. You do not need to list individual agent or command files in `plugin.json`. The conventions are:
+
+- Any `.md` file directly inside `agents/` is treated as an agent definition
+- Any `.md` file directly inside `commands/` is treated as a command definition
+- Any subdirectory inside `skills/` containing a `SKILL.md` file is treated as a skill
+
+The `marketplace.json` at the repository root does reference skills explicitly (as directory paths), but this is for the marketplace registry — not for plugin loading.
+
+<CardGroup cols={2}>
+  <Card title="Design Principles" href="/architecture/design-principles">
+    The philosophy behind single-responsibility plugin design
+  </Card>
+  <Card title="Model Strategy" href="/architecture/model-strategy">
+    How model tiers are assigned across agents
+  </Card>
+</CardGroup>

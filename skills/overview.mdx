@@ -1,0 +1,119 @@
+---
+title: "Agent Skills: progressive knowledge for Claude agents"
+description: "Learn how Agent Skills extend Claude's capabilities with modular, domain-specific knowledge using progressive disclosure architecture."
+---
+
+Agent Skills are modular knowledge packages that extend Claude's capabilities with specialized domain expertise. Rather than loading everything into context at once, each skill carries precise activation criteria and loads only the knowledge relevant to your current task — keeping token usage low and responses focused.
+
+## What are agent skills?
+
+A skill is a self-contained package of domain-specific guidance living inside a plugin. Each skill has a name, a description with explicit activation triggers, and layered content that Claude draws on progressively as a task demands more detail.
+
+When you ask Claude to "build a RAG system" or "set up a Kubernetes deployment with Helm," it matches your request against skill activation criteria and loads the right knowledge automatically. You don't invoke skills manually — they activate based on what you're doing.
+
+Skills complement agents: agents handle high-level reasoning and orchestration, skills supply the implementation patterns and domain knowledge those agents draw upon.
+
+```
+backend-architect agent → Plans API architecture
+  ↓
+api-design-principles skill → Provides REST/GraphQL best practices
+  ↓
+fastapi-templates skill → Supplies production-ready templates
+```
+
+## Progressive disclosure architecture
+
+Skills use a three-tier structure so Claude loads only what it needs, when it needs it. This is the core mechanism behind their token efficiency.
+
+<Steps>
+  <Step title="Tier 1 — Metadata (always loaded)">
+    The YAML frontmatter in `SKILL.md` contains the skill's name and its "Use when" activation description. This minimal header is loaded for every installed skill so Claude can recognize when a skill applies — without paying the cost of loading the full content.
+
+    ```yaml
+    ---
+    name: async-python-patterns
+    description: Master Python asyncio and async/await patterns for high-performance
+      applications. Use when building async APIs, concurrent systems, or I/O-bound
+      applications requiring non-blocking operations.
+    ---
+    ```
+  </Step>
+  <Step title="Tier 2 — Instructions (loaded when activated)">
+    When Claude determines a skill is relevant, it loads the skill's main body: core guidance, decision frameworks, patterns, and best practices. This is the primary knowledge layer that shapes Claude's responses.
+  </Step>
+  <Step title="Tier 3 — Resources (loaded on demand)">
+    Supporting material in `references/` subdirectories and `assets/` — templates, configuration files, worked examples — is loaded only when a task requires concrete implementation artifacts. Most interactions never reach this tier.
+  </Step>
+</Steps>
+
+<Note>
+  Installing a plugin with 16 skills loads roughly ~1,000 tokens of metadata, not the full content of all 16 skills. The full knowledge base only enters context when a skill is activated.
+</Note>
+
+## Skill structure
+
+Every skill lives in its own directory inside a plugin's `skills/` folder:
+
+```
+plugins/python-development/
+└── skills/
+    └── async-python-patterns/
+        ├── SKILL.md          # Required — frontmatter + content
+        ├── references/       # Optional — supporting material
+        │   └── asyncio-reference.md
+        └── assets/           # Optional — templates, configs
+```
+
+The `SKILL.md` file is the only required file. The frontmatter follows the Agent Skills Specification — a `name` in hyphen-case and a `description` that includes an explicit "Use when" trigger:
+
+```yaml
+---
+name: skill-name
+description: "What the skill covers. Use when [specific trigger conditions]."
+---
+```
+
+## How activation works
+
+Skills activate automatically when Claude detects a match between your request and a skill's description. Multiple skills can activate together when a task spans several domains:
+
+```
+"Set up Kubernetes deployment with Helm chart"
+→ activates: helm-chart-scaffolding, k8s-manifest-generator
+
+"Build a RAG system for document Q&A"
+→ activates: rag-implementation, prompt-engineering-patterns
+
+"Optimize Python async performance"
+→ activates: async-python-patterns, python-performance-optimization
+```
+
+The activation description is the key authoring surface for a skill. A well-written description with concrete trigger conditions produces accurate, consistent activation.
+
+<Tip>
+  When creating a new skill, write the `description` field first. It determines when your skill activates, which is the single most important factor in its usefulness.
+</Tip>
+
+## Token efficiency benefits
+
+The progressive disclosure model produces significant token savings compared to loading all domain knowledge upfront:
+
+- **Metadata only at install time** — 77 plugins with 149 skills load a small fraction of their total content on startup
+- **Activation is selective** — only skills relevant to the current task enter context
+- **Resources are deferred** — reference material and templates load only when the task requires concrete artifacts
+- **Plugin isolation** — installing `python-development` loads Python knowledge, not the entire marketplace
+
+This design lets you install broad coverage across many domains while keeping any individual session's context lean and focused.
+
+## Browse available skills
+
+The catalog contains all 149 skills organized by plugin, with names and descriptions sourced directly from each skill's frontmatter.
+
+<CardGroup cols={2}>
+  <Card title="Skills catalog" icon="list" href="/skills/catalog">
+    Browse all 149 skills organized by plugin — languages, infrastructure, backend, AI/ML, security, and more.
+  </Card>
+  <Card title="Architecture overview" icon="diagram-project" href="/architecture">
+    Understand how skills fit into the broader plugin architecture alongside agents and commands.
+  </Card>
+</CardGroup>

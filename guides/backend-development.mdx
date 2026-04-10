@@ -1,0 +1,149 @@
+---
+title: "Backend development with specialized API agents"
+description: "Design and build production-grade backend APIs using Claude Code Agents' backend development plugin with TDD, GraphQL, and event sourcing support."
+---
+
+The backend development plugin bundles four specialized architecture agents, a feature development orchestrator, and nine skills covering API design, architecture patterns, microservices, event sourcing, CQRS, and Temporal workflow orchestration. Each agent runs at the model tier appropriate for its task — Opus for critical architecture and security decisions, and the session's default model for implementation work.
+
+## Install the plugin
+
+```bash
+/plugin marketplace add wshobson/agents
+/plugin install backend-development
+```
+
+You will also want the TDD workflows plugin if you intend to follow a test-first discipline:
+
+```bash
+/plugin install tdd-workflows
+```
+
+## End-to-end feature development
+
+The `feature-development` command orchestrates the full lifecycle of a backend feature — requirements, architecture, implementation, testing, security review, performance analysis, deployment, and documentation:
+
+```bash
+/backend-development:feature-development "OAuth2 integration with social login"
+/backend-development:feature-development "payment processing API" --methodology tdd --complexity complex
+/backend-development:feature-development "webhook delivery system with retry logic"
+```
+
+The command saves all artifacts to `.feature-dev/` and stops at two user-approval checkpoints: once after architecture design and once after testing and validation.
+
+## Agents in this plugin
+
+<CardGroup cols={2}>
+  <Card title="backend-architect" icon="server">
+    Designs RESTful, GraphQL, and gRPC APIs; defines service boundaries with DDD; plans resilience patterns (circuit breakers, retries, timeouts); and creates observability strategies. Invokes `api-design-principles`, `architecture-patterns`, and `microservices-patterns` skills automatically.
+  </Card>
+  <Card title="graphql-architect" icon="share-nodes">
+    Architects federated GraphQL schemas with Apollo Federation v2, implements DataLoader for N+1 prevention, configures field-level caching and authorization, and designs real-time subscriptions. Runs on Opus.
+  </Card>
+  <Card title="tdd-orchestrator" icon="vials">
+    Enforces red-green-refactor discipline, coordinates multi-agent test workflows, implements property-based and mutation testing, and measures cycle time and coverage metrics. Runs on Sonnet.
+  </Card>
+  <Card title="event-sourcing-architect" icon="timeline">
+    Designs event stores, CQRS read/write model separation, projection building, saga orchestration, and snapshotting strategies for high-cardinality aggregates. Ideal for audit trails and temporal queries.
+  </Card>
+</CardGroup>
+
+## TDD workflow
+
+The `tdd-workflows` plugin exposes four commands that implement the complete red-green-refactor cycle. Use them individually or as a complete cycle:
+
+<Steps>
+  <Step title="Write failing tests first (red)">
+    Describe the behavior you want. The agent writes a failing test that defines the acceptance criteria before any implementation exists.
+
+    ```bash
+    /tdd-workflows:tdd-red "User can reset password via email link"
+    ```
+  </Step>
+  <Step title="Implement to make tests pass (green)">
+    Write the minimum code needed to make the failing tests pass — no more.
+
+    ```bash
+    /tdd-workflows:tdd-green
+    ```
+  </Step>
+  <Step title="Improve without breaking tests (refactor)">
+    Clean up the implementation, extract abstractions, and improve readability while keeping all tests green.
+
+    ```bash
+    /tdd-workflows:tdd-refactor
+    ```
+  </Step>
+  <Step title="Run a complete cycle">
+    Run all three phases in sequence with a single command:
+
+    ```bash
+    /tdd-workflows:tdd-cycle "Shopping cart calculates totals with discounts"
+    ```
+  </Step>
+</Steps>
+
+<Tip>
+  Pass the `--methodology tdd` flag to `feature-development` to make the backend-architect write failing tests before each implementation step throughout the orchestrated workflow.
+</Tip>
+
+## Backend skills
+
+Skills are modular knowledge packages that activate automatically when Claude detects a matching task. The backend-development plugin makes the following skills available:
+
+| Skill | Activates when... |
+|---|---|
+| `api-design-principles` | Designing REST or GraphQL APIs, versioning strategies, pagination |
+| `architecture-patterns` | Clean Architecture, Hexagonal Architecture, or Domain-Driven Design |
+| `microservices-patterns` | Service decomposition, event-driven communication, resilience patterns |
+| `workflow-orchestration-patterns` | Durable workflows with Temporal, saga patterns, distributed state |
+| `temporal-python-testing` | Testing Temporal workflows with pytest and time-skipping |
+| `event-store-design` | Event store schemas, snapshots, stream partitioning |
+| `cqrs-implementation` | Separate read/write models, eventual consistency |
+| `projection-patterns` | Building read-optimized views from event streams |
+| `saga-orchestration` | Distributed sagas with compensation logic and failure handling |
+
+Skills follow a three-tier progressive disclosure model — only their metadata is loaded until they are activated, keeping token usage minimal.
+
+## Usage examples
+
+```bash
+# Design a microservices architecture
+"Use backend-architect to design a multi-tenant SaaS API with RBAC"
+
+# GraphQL federation
+"Have graphql-architect build a federated schema for the e-commerce platform"
+
+# Event sourcing for order management
+"Use event-sourcing-architect to design an order aggregate with CQRS"
+
+# TDD for a specific service
+/tdd-workflows:tdd-red "Order service calculates shipping cost based on weight and destination"
+/tdd-workflows:tdd-green
+/tdd-workflows:tdd-refactor
+
+# Orchestrated feature with TDD methodology
+/backend-development:feature-development "rate limiting middleware" --methodology tdd
+
+# Natural language agent invocation
+"Have backend-architect implement circuit breaker patterns for the payment service"
+```
+
+## Composing with other plugins
+
+```bash
+# Deeper security audit after feature development
+/security-scanning:security-hardening
+
+# Generate OpenAPI specification from implementation
+/documentation-generation:doc-generate
+
+# Full-stack orchestration (includes this plugin's agents)
+/full-stack-orchestration:full-stack-feature "user authentication with OAuth2"
+
+# Code review across architecture, security, and performance dimensions
+/comprehensive-review:full-review
+```
+
+<Note>
+  The `backend-architect` agent intentionally defers database schema design to `database-architect` and infrastructure decisions to `cloud-architect`. Install `database-design` and `cloud-infrastructure` plugins when those concerns are in scope.
+</Note>

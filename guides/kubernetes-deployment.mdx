@@ -1,0 +1,192 @@
+---
+title: "Kubernetes deployment with Claude Code Agents"
+description: "Deploy production applications to Kubernetes using Claude Code Agents with manifest generation, Helm charts, GitOps workflows, and security policies."
+---
+
+Claude Code Agents' `kubernetes-operations` plugin gives you a production-grade Kubernetes expert directly in your editor. The `kubernetes-architect` agent — powered by Claude Opus — handles everything from manifest generation and Helm chart scaffolding to GitOps automation and Pod Security Standards, so you can go from a plain-English description to a running cluster without leaving your terminal.
+
+## Install the plugin
+
+```bash
+/plugin install kubernetes-operations
+```
+
+This loads the `kubernetes-architect` agent and four specialized skills into your session. Nothing else is added to your context.
+
+## The kubernetes-architect agent
+
+The `kubernetes-architect` agent runs on **Claude Opus** (Tier 1 — highest capability) because Kubernetes architecture decisions require nuanced reasoning: choosing the right deployment strategy, balancing cost against reliability, and designing security policies that don't break workloads.
+
+**Trigger it with natural language:**
+
+```
+"Create production Kubernetes deployment with Helm chart and GitOps"
+"Design a multi-cluster platform with ArgoCD for a financial services app"
+"Implement progressive delivery with canary deployments and automated rollbacks"
+"Secure a multi-tenant Kubernetes cluster with RBAC and network policies"
+```
+
+Claude Code automatically activates the agent and the relevant skills for your request.
+
+## The four Kubernetes skills
+
+Skills follow a progressive disclosure architecture: their descriptions are always loaded, but their full content is only pulled into context when activated. This keeps token usage low while still providing deep expertise on demand.
+
+| Skill | Activates when |
+|---|---|
+| `k8s-manifest-generator` | You need Deployment, Service, ConfigMap, or Secret YAML |
+| `helm-chart-scaffolding` | You need to package an application as a Helm chart |
+| `gitops-workflow` | You need ArgoCD or Flux CD setup and sync policies |
+| `k8s-security-policies` | You need NetworkPolicy, RBAC, or Pod Security Standards |
+
+### k8s-manifest-generator
+
+Generates production-ready Kubernetes manifests for Deployments, Services, ConfigMaps, Secrets, and PersistentVolumeClaims. The skill enforces best practices automatically: resource limits, liveness and readiness probes, security contexts, and multi-environment labeling conventions.
+
+### helm-chart-scaffolding
+
+Scaffolds complete Helm 3.x charts from scratch, including chart structure, values files, templating patterns, and environment-specific overrides. Covers Helm repositories, chart dependencies, and release management.
+
+### gitops-workflow
+
+Implements declarative GitOps with ArgoCD or Flux v2, following the four OpenGitOps principles: declarative desired state, versioned and immutable configuration, automatically pulled updates, and continuously reconciled actual state. Covers app-of-apps patterns, multi-repo strategies, progressive delivery, and secret management with External Secrets Operator or Sealed Secrets.
+
+### k8s-security-policies
+
+Implements defense-in-depth Kubernetes security: Pod Security Standards (Restricted, Baseline, Privileged), NetworkPolicy for namespace isolation, RBAC with least-privilege service accounts, and admission controllers via OPA/Gatekeeper or Kyverno.
+
+## Deployment workflow
+
+<Steps>
+  <Step title="Install the plugin">
+    Add `kubernetes-operations` to your Claude Code session:
+
+    ```bash
+    /plugin install kubernetes-operations
+    ```
+  </Step>
+
+  <Step title="Describe your workload">
+    Tell the agent what you are deploying in plain English. It will ask clarifying questions if needed:
+
+    ```
+    "Deploy a FastAPI microservice to production Kubernetes with auto-scaling,
+     a Helm chart, and GitOps via ArgoCD"
+    ```
+
+    The agent activates `k8s-manifest-generator` and `helm-chart-scaffolding` automatically.
+  </Step>
+
+  <Step title="Generate manifests and Helm chart">
+    The `k8s-manifest-generator` skill produces a base Deployment with resource limits, probes, and security context. The `helm-chart-scaffolding` skill then wraps those manifests into a reusable chart:
+
+    ```
+    my-service/
+    ├── Chart.yaml
+    ├── values.yaml
+    ├── values-staging.yaml
+    ├── values-production.yaml
+    └── templates/
+        ├── deployment.yaml
+        ├── service.yaml
+        ├── configmap.yaml
+        ├── hpa.yaml
+        └── _helpers.tpl
+    ```
+  </Step>
+
+  <Step title="Set up GitOps with ArgoCD">
+    Activate the `gitops-workflow` skill by mentioning ArgoCD or GitOps:
+
+    ```
+    "Set up ArgoCD to continuously sync this Helm chart from the main branch"
+    ```
+
+    The agent produces an ArgoCD `Application` manifest and configures automated sync with self-healing:
+
+    ```yaml
+    apiVersion: argoproj.io/v1alpha1
+    kind: Application
+    metadata:
+      name: my-service
+      namespace: argocd
+    spec:
+      source:
+        repoURL: https://github.com/your-org/k8s-config
+        targetRevision: main
+        path: apps/my-service
+        helm:
+          valueFiles:
+            - values-production.yaml
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+    ```
+  </Step>
+
+  <Step title="Apply security policies">
+    Add network isolation and pod security by asking for hardening:
+
+    ```
+    "Apply Kubernetes security policies: restrict pod capabilities, add
+     NetworkPolicy for namespace isolation, configure RBAC"
+    ```
+
+    The `k8s-security-policies` skill generates NetworkPolicy rules, Pod Security Standard labels for the namespace, and scoped ServiceAccount + Role + RoleBinding definitions.
+  </Step>
+
+  <Step title="Review and deploy">
+    Review the generated manifests, then apply or let ArgoCD sync automatically:
+
+    ```bash
+    # Manual apply
+    helm install my-service ./my-service -f values-production.yaml -n my-namespace
+
+    # Or push to Git and let ArgoCD sync
+    git add . && git commit -m "Deploy my-service to production"
+    git push origin main
+    ```
+  </Step>
+</Steps>
+
+## Supported platforms
+
+The `kubernetes-architect` agent covers all major Kubernetes distributions and cloud providers:
+
+<CardGroup cols={2}>
+  <Card title="Managed Kubernetes" icon="cloud">
+    EKS (AWS), AKS (Azure), GKE (Google Cloud), OKE (Oracle Cloud) — with provider-specific optimizations and integrations.
+  </Card>
+  <Card title="Enterprise distributions" icon="building">
+    Red Hat OpenShift, Rancher, VMware Tanzu — including platform-specific admission controllers and registry configurations.
+  </Card>
+  <Card title="Self-managed clusters" icon="server">
+    kubeadm, kops, kubespray, bare-metal, and air-gapped deployments with full lifecycle management.
+  </Card>
+  <Card title="Service meshes" icon="share-nodes">
+    Istio, Linkerd, Cilium, and Consul Connect — traffic management, mTLS, and observability integration.
+  </Card>
+</CardGroup>
+
+## Combining with other plugins
+
+The `kubernetes-operations` plugin composes well with the broader marketplace:
+
+```bash
+# 1. Build and scan the container image
+/security-scanning:security-sast
+
+# 2. Generate K8s manifests and Helm chart
+"Create production Kubernetes deployment with Helm chart"
+
+# 3. Set up CI/CD to build and push to the cluster
+/cicd-automation:workflow-automate
+
+# 4. Add monitoring
+/observability-monitoring:monitor-setup
+```
+
+<Tip>
+The three-tier model strategy means `kubernetes-architect` (Opus) handles the complex architecture decisions, while `deployment-engineer` (Haiku) in the `cicd-automation` plugin handles the faster, more routine pipeline tasks. This combination gives you both depth and speed.
+</Tip>

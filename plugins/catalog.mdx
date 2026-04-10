@@ -1,0 +1,431 @@
+---
+title: "Plugin catalog: all 77 Claude Code plugins"
+description: "Browse all 77 Claude Code Agents plugins across 24 categories — development, infrastructure, security, AI/ML, languages, operations, and more."
+---
+
+The Claude Code Agents marketplace ships 77 focused, single-purpose plugins organised into 24 categories. Install only the plugins your project needs — each one loads its own agents, commands, and skills without touching the rest of the marketplace.
+
+```bash
+# Register the marketplace (one-time setup)
+/plugin marketplace add wshobson/agents
+
+# Install any plugin below
+/plugin install <plugin-name>
+```
+
+---
+
+<AccordionGroup>
+
+<Accordion title="🎨 Development (5 plugins)">
+
+| Plugin | Description |
+|--------|-------------|
+| **debugging-toolkit** | Interactive debugging, error analysis, and DX optimisation |
+| **backend-development** | RESTful and GraphQL API design with TDD and architecture patterns |
+| **frontend-mobile-development** | React/React Native components with automated scaffolding |
+| **ui-design** | UI/UX design for iOS, Android, React Native, and web |
+| **multi-platform-apps** | Cross-platform coordination across web, iOS, and Android |
+
+```bash
+/plugin install debugging-toolkit
+/plugin install backend-development
+/plugin install frontend-mobile-development
+/plugin install ui-design
+/plugin install multi-platform-apps
+```
+
+</Accordion>
+
+<Accordion title="📚 Documentation (4 plugins)">
+
+| Plugin | Description |
+|--------|-------------|
+| **code-documentation** | Automated doc generation, code explanation, and tutorial creation |
+| **documentation-generation** | OpenAPI specs, Mermaid diagrams, and technical references |
+| **c4-architecture** | Bottom-up C4 documentation: code → component → container → context |
+| **documentation-standards** | HADS (Human-AI Document Standard) — semantic tagging for token-efficient AI documentation |
+
+```bash
+/plugin install code-documentation
+/plugin install documentation-generation
+/plugin install c4-architecture
+/plugin install documentation-standards
+```
+
+</Accordion>
+
+<Accordion title="🔄 Workflows (5 plugins)">
+
+| Plugin | Description |
+|--------|-------------|
+| **conductor** | Context-driven development with tracks, specs, and phased plans |
+| **git-pr-workflows** | Git automation, PR enhancement, and team onboarding |
+| **full-stack-orchestration** | End-to-end multi-agent feature development |
+| **tdd-workflows** | Test-driven development methodology |
+| **agent-teams** | Multi-agent team orchestration with parallel workflows |
+
+```bash
+/plugin install conductor
+/plugin install git-pr-workflows
+/plugin install full-stack-orchestration
+/plugin install tdd-workflows
+/plugin install agent-teams
+```
+
+</Accordion>
+
+<Accordion title="✅ Testing (1 plugin)">
+
+| Plugin | Description |
+|--------|-------------|
+| **unit-testing** | Automated pytest (Python) and Jest (JavaScript) test generation |
+
+```bash
+/plugin install unit-testing
+```
+
+</Accordion>
+
+<Accordion title="🔍 Quality (3 plugins)">
+
+| Plugin | Description |
+|--------|-------------|
+| **comprehensive-review** | Multi-perspective code analysis: architecture, security, performance |
+| **performance-testing-review** | Performance profiling and test coverage review |
+| **plugin-eval** | Three-layer quality evaluation framework for plugins and skills |
+
+```bash
+/plugin install comprehensive-review
+/plugin install performance-testing-review
+/plugin install plugin-eval
+```
+
+</Accordion>
+
+<Accordion title="🤖 AI & ML (5 plugins)">
+
+| Plugin | Description |
+|--------|-------------|
+| **llm-application-dev** | LLM apps, RAG systems, prompt engineering, vector databases |
+| **agent-orchestration** | Multi-agent system design and context management |
+| **context-management** | Context persistence and session restoration |
+| **machine-learning-ops** | ML training pipelines, MLOps, experiment tracking |
+| **ai-tools** | AI utility commands and integration helpers |
+
+```bash
+/plugin install llm-application-dev
+/plugin install agent-orchestration
+/plugin install context-management
+/plugin install machine-learning-ops
+/plugin install ai-tools
+```
+
+</Accordion>
+
+<Accordion title="📊 Data (2 plugins)">
+
+| Plugin | Description |
+|--------|-------------|
+| **data-engineering** | ETL pipelines, data warehouses, and streaming architectures |
+| **data-validation-suite** | Schema validation, data quality, and secure backend coding |
+
+```bash
+/plugin install data-engineering
+/plugin install data-validation-suite
+```
+
+</Accordion>
+
+<Accordion title="🗄️ Database (2 plugins)">
+
+| Plugin | Description |
+|--------|-------------|
+| **database-design** | Database architecture, technology selection, and schema modelling |
+| **database-migrations** | Migration automation, backup, replication, and monitoring |
+
+```bash
+/plugin install database-design
+/plugin install database-migrations
+```
+
+</Accordion>
+
+<Accordion title="🚨 Operations (4 plugins)">
+
+| Plugin | Description |
+|--------|-------------|
+| **incident-response** | Rapid triage, root cause analysis, and automated resolution |
+| **error-diagnostics** | Error tracing and root cause analysis |
+| **distributed-debugging** | Distributed system tracing across microservices |
+| **observability-monitoring** | Metrics, logging, distributed tracing, and SLI/SLO management |
+
+```bash
+/plugin install incident-response
+/plugin install error-diagnostics
+/plugin install distributed-debugging
+/plugin install observability-monitoring
+```
+
+</Accordion>
+
+<Accordion title="⚡ Performance (2 plugins)">
+
+| Plugin | Description |
+|--------|-------------|
+| **application-performance** | Application profiling and optimisation |
+| **database-cloud-optimization** | Database query and cloud cost optimisation |
+
+```bash
+/plugin install application-performance
+/plugin install database-cloud-optimization
+```
+
+</Accordion>
+
+<Accordion title="☁️ Infrastructure (5 plugins)">
+
+| Plugin | Description |
+|--------|-------------|
+| **deployment-strategies** | Deployment patterns, rollback automation, and blue/green |
+| **deployment-validation** | Pre-deployment checks and environment validation |
+| **kubernetes-operations** | K8s manifests, Helm charts, and GitOps workflows |
+| **cloud-infrastructure** | AWS/Azure/GCP architecture with Terraform IaC |
+| **cicd-automation** | CI/CD pipeline configuration for GitHub Actions and GitLab CI |
+
+```bash
+/plugin install deployment-strategies
+/plugin install deployment-validation
+/plugin install kubernetes-operations
+/plugin install cloud-infrastructure
+/plugin install cicd-automation
+```
+
+</Accordion>
+
+<Accordion title="🔒 Security (6 plugins)">
+
+| Plugin | Description |
+|--------|-------------|
+| **security-scanning** | SAST analysis, dependency scanning, threat modelling, and comprehensive hardening workflows |
+| **security-compliance** | SOC2, HIPAA, and GDPR compliance automation |
+| **backend-api-security** | API security, authentication, and authorisation patterns |
+| **frontend-mobile-security** | XSS/CSRF prevention, CSP, and mobile security |
+| **block-no-verify** | Git hook bypass guard — prevents `--no-verify` misuse |
+| **reverse-engineering** | Binary analysis, malware investigation, firmware security, and CTF tooling |
+
+```bash
+/plugin install security-scanning
+/plugin install security-compliance
+/plugin install backend-api-security
+/plugin install frontend-mobile-security
+/plugin install block-no-verify
+/plugin install reverse-engineering
+```
+
+</Accordion>
+
+<Accordion title="💻 Languages (11 plugins)">
+
+| Plugin | Description |
+|--------|-------------|
+| **python-development** | Python 3.12+ with Django, FastAPI, async patterns, and uv |
+| **javascript-typescript** | JavaScript/TypeScript with Node.js, Next.js, and Vite |
+| **systems-programming** | Rust, Go, C, and C++ for systems-level development |
+| **jvm-languages** | Java, Scala, and C# with enterprise patterns |
+| **web-scripting** | PHP and Ruby for web applications |
+| **functional-programming** | Elixir with OTP, Phoenix, and Haskell |
+| **arm-cortex-microcontrollers** | ARM Cortex-M firmware and peripheral drivers |
+| **api-scaffolding** | Django and FastAPI project scaffolding |
+| **julia-development** | Julia 1.10+ for scientific computing and high-performance numerical code |
+| **dotnet-contribution** | .NET/C# contribution workflows and open-source tooling |
+| **game-development** | Unity game development and Minecraft plugin authoring |
+
+```bash
+/plugin install python-development
+/plugin install javascript-typescript
+/plugin install systems-programming
+/plugin install jvm-languages
+/plugin install web-scripting
+/plugin install functional-programming
+/plugin install arm-cortex-microcontrollers
+/plugin install api-scaffolding
+/plugin install julia-development
+/plugin install dotnet-contribution
+/plugin install game-development
+```
+
+</Accordion>
+
+<Accordion title="🔗 Blockchain (1 plugin)">
+
+| Plugin | Description |
+|--------|-------------|
+| **blockchain-web3** | Solidity smart contracts, DeFi protocols, and Web3 app development |
+
+```bash
+/plugin install blockchain-web3
+```
+
+</Accordion>
+
+<Accordion title="💰 Finance (1 plugin)">
+
+| Plugin | Description |
+|--------|-------------|
+| **quantitative-trading** | Algorithmic trading strategies, financial modelling, and risk management |
+
+```bash
+/plugin install quantitative-trading
+```
+
+</Accordion>
+
+<Accordion title="💳 Payments (1 plugin)">
+
+| Plugin | Description |
+|--------|-------------|
+| **payment-processing** | Stripe and PayPal integration, billing, and subscription management |
+
+```bash
+/plugin install payment-processing
+```
+
+</Accordion>
+
+<Accordion title="🎮 Gaming (1 plugin)">
+
+| Plugin | Description |
+|--------|-------------|
+| **game-development** | Unity game development and Minecraft Bukkit plugin authoring |
+
+```bash
+/plugin install game-development
+```
+
+</Accordion>
+
+<Accordion title="🎨 Creative (1 plugin)">
+
+| Plugin | Description |
+|--------|-------------|
+| **meigen-ai-design** | AI image generation with creative workflow orchestration and prompt MCPs |
+
+```bash
+/plugin install meigen-ai-design
+```
+
+</Accordion>
+
+<Accordion title="♿ Accessibility (1 plugin)">
+
+| Plugin | Description |
+|--------|-------------|
+| **accessibility-compliance** | WCAG auditing, screen reader testing, and inclusive design |
+
+```bash
+/plugin install accessibility-compliance
+```
+
+</Accordion>
+
+<Accordion title="📢 Marketing (4 plugins)">
+
+| Plugin | Description |
+|--------|-------------|
+| **seo-content-creation** | SEO content writing, planning, and E-E-A-T optimisation |
+| **seo-technical-optimization** | Meta tags, keyword analysis, schema markup, and snippets |
+| **seo-analysis-monitoring** | Content freshness, authority building, and cannibalization detection |
+| **content-marketing** | Blog posts, social media, email campaigns, and web research |
+
+```bash
+/plugin install seo-content-creation
+/plugin install seo-technical-optimization
+/plugin install seo-analysis-monitoring
+/plugin install content-marketing
+```
+
+</Accordion>
+
+<Accordion title="💼 Business (5 plugins)">
+
+| Plugin | Description |
+|--------|-------------|
+| **business-analytics** | KPI tracking, financial reporting, and metrics analysis |
+| **hr-legal-compliance** | HR policies, employee relations, and legal documentation |
+| **customer-sales-automation** | Support tickets, cold outreach, and sales automation |
+| **team-collaboration** | Team workflows, standup automation, and DX optimisation |
+| **startup-business-analyst** | Market sizing (TAM/SAM/SOM), financial modelling, and strategic analysis for early-stage companies |
+
+```bash
+/plugin install business-analytics
+/plugin install hr-legal-compliance
+/plugin install customer-sales-automation
+/plugin install team-collaboration
+/plugin install startup-business-analyst
+```
+
+</Accordion>
+
+<Accordion title="🔌 API (2 plugins)">
+
+| Plugin | Description |
+|--------|-------------|
+| **api-scaffolding** | REST and GraphQL API generation with framework scaffolding |
+| **api-testing-observability** | API testing, OpenAPI specs, and developer documentation |
+
+```bash
+/plugin install api-scaffolding
+/plugin install api-testing-observability
+```
+
+</Accordion>
+
+<Accordion title="🛠️ Utilities (5 plugins)">
+
+| Plugin | Description |
+|--------|-------------|
+| **developer-essentials** | Monorepo tooling (Nx, Turborepo), Git advanced workflows, and essential developer patterns |
+| **code-refactoring** | Code cleanup, technical debt management, and modernisation |
+| **dependency-management** | Dependency auditing, version management, and security scanning |
+| **error-debugging** | Error analysis, log inspection, and trace debugging |
+| **team-collaboration** | Team workflow utilities and standup automation |
+
+```bash
+/plugin install developer-essentials
+/plugin install code-refactoring
+/plugin install dependency-management
+/plugin install error-debugging
+/plugin install team-collaboration
+```
+
+</Accordion>
+
+<Accordion title="🔧 Modernization (2 plugins)">
+
+| Plugin | Description |
+|--------|-------------|
+| **framework-migration** | Framework upgrades, migration planning, and legacy modernisation |
+| **codebase-cleanup** | Technical debt reduction, dead code removal, and refactoring |
+
+```bash
+/plugin install framework-migration
+/plugin install codebase-cleanup
+```
+
+</Accordion>
+
+</AccordionGroup>
+
+---
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Plugin overview" icon="puzzle-piece" href="/plugins/overview">
+    Understand plugin anatomy, install workflow, and design philosophy.
+  </Card>
+  <Card title="Agent catalog" icon="robot" href="/agents/catalog">
+    Browse all 182 agents with model assignments and descriptions.
+  </Card>
+</CardGroup>

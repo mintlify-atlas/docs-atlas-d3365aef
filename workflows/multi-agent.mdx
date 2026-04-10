@@ -1,0 +1,298 @@
+---
+title: "Multi-agent orchestration: coordinate AI specialists"
+description: "Discover how Claude Code Agents orchestrates multiple AI specialists in parallel workflows for full-stack development, security, and ML pipelines."
+---
+
+Multi-agent orchestration lets a single command coordinate a chain of specialized AI agents — each with deep domain knowledge — so that complex engineering tasks that would normally span hours of manual coordination happen in a single, structured workflow. Rather than invoking one agent and manually passing its output to the next, the orchestrators handle sequencing, state persistence, checkpoint approvals, and error recovery automatically. The result is repeatable, production-grade workflows for full-stack development, security hardening, ML pipelines, incident response, and more.
+
+## How orchestration works
+
+Each orchestrator follows the same pattern:
+
+1. **Pre-flight check** — Detects any in-progress session and offers to resume or start fresh
+2. **Phased execution** — Steps run in order; each writes output to a file before the next begins
+3. **Phase checkpoints** — At the end of each phase, execution pauses for your review and approval
+4. **Error halting** — If any step fails, the orchestrator stops and asks how to proceed
+5. **State persistence** — Progress is saved to a `state.json` file so sessions survive interruptions
+
+<Note>
+  Orchestrators use file-based state, not in-memory context, so each agent step reads from prior output files. This ensures reliable handoffs even across long-running workflows.
+</Note>
+
+## Full-stack feature development
+
+The flagship orchestrator coordinates seven specialist agents across three phases — from gathering requirements through to deployment configuration and documentation.
+
+```bash
+/full-stack-orchestration:full-stack-feature "user authentication with OAuth2"
+
+# With explicit stack and API style
+/full-stack-orchestration:full-stack-feature "user dashboard" --stack react/fastapi/postgres --api-style graphql --complexity complex
+```
+
+**Agent chain:** `backend-architect` → `database-architect` → `frontend-developer` → `test-automator` → `security-auditor` → `deployment-engineer` → `observability-engineer`
+
+<Steps>
+  <Step title="Phase 1: Architecture & design foundation">
+    The orchestrator gathers requirements through interactive Q&A — one question at a time — then passes them to specialist agents:
+
+    - **Requirements gathering** — Problem statement, acceptance criteria, scope boundaries, tech constraints
+    - **Database design** — Entity relationships, schema, indexing strategy, migration plan
+    - **Backend & frontend architecture** — API design, service layer, component hierarchy, state management
+
+    A checkpoint asks you to approve the architecture before implementation begins.
+  </Step>
+  <Step title="Phase 2: Implementation">
+    Four parallel and sequential steps build the full feature:
+
+    - **Database implementation** — Migrations, models, repository layer, query optimization
+    - **Backend implementation** — API endpoints, business logic, auth middleware, structured logging
+    - **Frontend implementation** — UI components, state management, API integration, accessibility
+    - **Testing & validation** — Three agents run in parallel: test suite creation (80%+ coverage target), security review (OWASP Top 10), and performance review (N+1 queries, bundle size)
+
+    Critical or high-severity findings from security and performance review are addressed before the second checkpoint.
+  </Step>
+  <Step title="Phase 3: Delivery">
+    - **Deployment & infrastructure** — CI/CD pipeline updates, feature flags, health checks, monitoring alerts, rollback runbook
+    - **Documentation & handoff** — API docs, schema change notes, architecture decision records, handoff summary
+  </Step>
+</Steps>
+
+Output files are written to `.full-stack-feature/` so every artifact is reviewable after the workflow completes.
+
+## Security hardening workflow
+
+A 13-step, 4-phase deep security assessment and remediation workflow:
+
+```bash
+/security-scanning:security-hardening "payment service API"
+
+# With depth and compliance framework flags
+/security-scanning:security-hardening --depth comprehensive --compliance owasp,pci-dss,soc2
+```
+
+**Agent chain:** `security-auditor` → `threat-modeling-expert` → `backend-security-coder` → `frontend-security-coder` → `mobile-security-coder` → `test-automator`
+
+<Steps>
+  <Step title="Phase 1: Assessment & threat modeling">
+    - Vulnerability scan with CVSS scoring (SAST, DAST, dependency audit, secrets detection, SBOM)
+    - STRIDE threat modeling with MITRE ATT&CK mapping and business impact analysis
+    - Architecture security review with zero-trust recommendations
+
+    Checkpoint: review vulnerability counts, threat priorities, and architecture concerns before proceeding.
+  </Step>
+  <Step title="Phase 2: Vulnerability remediation">
+    - Critical vulnerability fixes (CVSS 7+) — SQL injection, XSS, auth bypasses, insecure deserialization
+    - Backend hardening — input validation, rate limiting, OAuth2/JWT, AES-256/TLS 1.3, secure logging
+    - Frontend hardening — CSP headers, XSS prevention (DOMPurify), PKCE OAuth2, SRI, secure cookies
+    - Mobile hardening — certificate pinning, biometric auth, encrypted local storage, anti-tampering
+
+    Checkpoint: review all remediation work before proceeding to controls.
+  </Step>
+  <Step title="Phase 3: Security controls & infrastructure">
+    - Authentication & authorization — OAuth2/OIDC with PKCE, MFA (TOTP/WebAuthn/FIDO2), RBAC/ABAC
+    - Infrastructure controls — WAF rules, network micro-segmentation, IDS/IPS, DDoS protection
+    - Secrets management — HashiCorp Vault or AWS Secrets Manager, rotation policies, HSM key management
+
+    Checkpoint: review auth controls, infrastructure configuration, and secrets setup.
+  </Step>
+  <Step title="Phase 4: Validation & compliance">
+    - Penetration testing — authenticated and unauthenticated, API security, business logic, privilege escalation
+    - Compliance verification — OWASP ASVS Level 2, CIS Benchmarks, SOC2/GDPR/HIPAA/PCI-DSS as applicable
+    - Security monitoring — SIEM integration (Splunk/ELK/Sentinel), correlation rules, incident response playbooks
+  </Step>
+</Steps>
+
+Output files are written to `.security-hardening/` for full traceability.
+
+## TDD workflow
+
+A structured test-driven development cycle that keeps your code and tests in sync:
+
+```bash
+# Full red-green-refactor cycle
+/tdd-workflows:tdd-cycle "User can reset password via email link"
+
+# Step by step
+/tdd-workflows:tdd-red "User can reset password via email link"
+/tdd-workflows:tdd-green
+/tdd-workflows:tdd-refactor
+```
+
+**Agent chain:** `tdd-orchestrator` coordinates `test-automator` → `backend-architect` → `code-reviewer`
+
+| Command | What happens |
+|---|---|
+| `tdd-red` | Writes failing tests that define the desired behavior |
+| `tdd-green` | Implements the minimum code to make those tests pass |
+| `tdd-refactor` | Cleans up the implementation while keeping the test suite green |
+
+The TDD workflow integrates with the full-stack orchestrator — `test-automator` runs as part of Phase 2 of the full-stack workflow for end-to-end coverage.
+
+## Conductor: context-driven development
+
+Conductor transforms Claude Code into a project management layer with a structured **Context → Spec & Plan → Implement** workflow. State persists across sessions, so setup survives workspace restarts.
+
+```bash
+/plugin install conductor@claude-code-workflows
+```
+
+<Steps>
+  <Step title="Set up project context">
+    ```bash
+    /conductor:setup
+    ```
+
+    Interactive setup creates and persists:
+
+    - Product vision and goals
+    - Tech stack configuration
+    - Workflow rules and coding standards
+    - Style guides and conventions
+  </Step>
+  <Step title="Create a development track">
+    ```bash
+    /conductor:new-track "Add OAuth2 authentication with GitHub and Google providers"
+    ```
+
+    Generates a full specification and phased implementation plan. Review and approve before work begins.
+  </Step>
+  <Step title="Implement with checkpoints">
+    ```bash
+    /conductor:implement
+    ```
+
+    Executes tasks in the active track with verification checkpoints at each phase. Built-in TDD workflow ensures tests are written alongside code.
+  </Step>
+  <Step title="Revert if needed">
+    ```bash
+    /conductor:revert track      # Undo the entire track
+    /conductor:revert phase      # Undo the last phase
+    /conductor:revert task       # Undo the last task
+    ```
+
+    Semantic revert undoes work by logical unit, not by commit hash.
+  </Step>
+</Steps>
+
+Check current project context at any time:
+
+```bash
+/conductor:status
+```
+
+## Agent teams: parallel multi-agent workflows
+
+The agent-teams plugin uses Claude Code's experimental Agent Teams feature to run genuinely parallel workflows — each teammate operates in its own process (tmux pane, iTerm2 tab, or in-process).
+
+```bash
+/plugin install agent-teams@claude-code-workflows
+export CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1
+```
+
+### Seven preset team configurations
+
+| Preset | Command | What it does |
+|---|---|---|
+| `review` | `/team-spawn review` | Parallel code review across security, performance, architecture, testing, and accessibility dimensions |
+| `debug` | `/team-spawn debug` | Competing hypothesis debugging — each agent investigates a different root cause theory |
+| `feature` | `/team-spawn feature` | Parallel feature development with strict file ownership boundaries |
+| `fullstack` | `/team-spawn fullstack` | Full-stack implementation with frontend and backend streams |
+| `research` | `/team-spawn research` | Parallel investigation across codebase (Grep/Read) and web sources |
+| `security` | `/team-spawn security` | 4 reviewers covering OWASP, auth/access, dependency supply chain, and secrets/configuration |
+| `migration` | `/team-spawn migration` | Lead plans the migration, 2 implementers work in parallel streams, reviewer verifies correctness |
+
+### Targeted team commands
+
+```bash
+# Multi-reviewer parallel code review
+/team-review src/ --reviewers security,performance,architecture
+
+# Hypothesis-driven debugging
+/team-debug "API returns 500 on POST /users with valid payload" --hypotheses 3
+
+# Parallel feature development
+/team-feature "Add OAuth2 authentication" --team-size 3 --plan-first
+
+# Custom team composition
+/team-spawn custom --name my-team --members 4
+```
+
+### Managing active teams
+
+```bash
+/team-status          # Check team member progress and current tasks
+/team-delegate --rebalance   # Redistribute work if one agent is blocked
+/team-shutdown        # Gracefully shut down the team and clean up resources
+```
+
+<Tip>
+  Use `--plan-first` with `/team-feature` to review work stream decomposition and file ownership assignments before spawning implementers. File ownership conflicts are the most common source of merge issues in parallel development.
+</Tip>
+
+### Team agents
+
+| Agent | Role |
+|---|---|
+| `team-lead` | Decomposes work, manages the team lifecycle, synthesizes results |
+| `team-reviewer` | Operates on an assigned review dimension (security, performance, etc.) |
+| `team-debugger` | Investigates an assigned hypothesis, collects evidence, reports findings |
+| `team-implementer` | Implements within strict file ownership boundaries |
+
+## Other multi-agent workflows
+
+Beyond the flagship orchestrators, several other plugins coordinate multiple agents:
+
+### Data & ML pipeline
+
+```bash
+/machine-learning-ops:ml-pipeline "customer churn prediction model"
+```
+
+**Agent chain:** `data-scientist` → `data-engineer` → `ml-engineer` → `mlops-engineer` → `performance-engineer`
+
+### Incident response
+
+```bash
+/incident-response:smart-fix "production memory leak in payment service"
+```
+
+**Agent chain:** `incident-responder` → `devops-troubleshooter` → `debugger` → `error-detective` → `observability-engineer`
+
+### C4 architecture documentation
+
+```bash
+/c4-architecture:c4-architecture
+```
+
+**Agent chain:** `c4-code` → `c4-component` → `c4-container` → `c4-context`
+
+Produces a complete `C4-Documentation/` directory with Mermaid diagrams at all four levels — from code-level function signatures up to high-level system context with personas and external dependencies.
+
+## Model strategy in orchestrated workflows
+
+Orchestrators assign the right model tier to each step based on the task type:
+
+| Tier | Model | Typical use in orchestration |
+|---|---|---|
+| Tier 1 | Opus 4.6 | Architecture decisions, security audits, all code review |
+| Tier 2 | Inherit | Complex specialized tasks — uses your session default |
+| Tier 3 | Sonnet 4.6 | Testing, debugging, documentation generation |
+| Tier 4 | Haiku 4.5 | Deployment config, simple docs, fast operational tasks |
+
+A typical full-stack orchestration pattern looks like:
+
+```
+Opus (architecture design) → Sonnet (feature implementation) → Haiku (deployment config)
+```
+
+This ensures that the most capable model handles the decisions with the highest leverage, while faster and more cost-effective models handle well-defined execution tasks.
+
+<CardGroup cols={2}>
+  <Card title="Command reference" icon="terminal" href="/workflows/commands">
+    Full syntax for all 96 slash commands organized by category.
+  </Card>
+  <Card title="Workflows overview" icon="play" href="/workflows/overview">
+    Slash commands vs. natural language — when and how to use each approach.
+  </Card>
+</CardGroup>

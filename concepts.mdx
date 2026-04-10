@@ -1,0 +1,232 @@
+---
+title: "Core concepts: plugins, agents, skills, commands"
+description: "Understand the four building blocks of Claude Code Agents — plugins, agents, skills, and commands — and how they compose into powerful workflows."
+---
+
+Claude Code Agents is built around four composable primitives: **plugins** bundle everything together, **agents** are the domain specialists, **skills** provide deep knowledge on demand, and **commands** are the executable entry points. Understanding how these relate to each other will help you pick the right tools and get the most out of the system.
+
+## Plugins
+
+A plugin is the unit of installation. It is a self-contained directory that may contain agents, commands, and skills — all scoped to a single, focused purpose.
+
+When you run `/plugin install python-development`, only the three Python agents, the scaffolding command, and the 16 Python skills load into Claude's context. The other 76 plugins remain inert. This is the core design principle: **install only what you need**.
+
+```
+plugins/python-development/
+├── agents/
+│   ├── python-pro.md
+│   ├── django-pro.md
+│   └── fastapi-pro.md
+├── commands/
+│   └── python-scaffold.md
+└── skills/
+    ├── async-python-patterns/
+    ├── python-testing-patterns/
+    ├── python-packaging/
+    ├── python-performance-optimization/
+    └── uv-package-manager/
+```
+
+Plugins follow the **single responsibility principle** — each one is describable in five to ten words. The average plugin contains 3.6 components, within Anthropic's recommended 2–8 range.
+
+<Tip>
+  Browse the full list of 77 plugins in the [plugin catalog](/plugins/catalog).
+</Tip>
+
+## Agents
+
+An agent is a specialized AI persona with deep domain knowledge, a system prompt, and an assigned model. Agents are the "who" in a workflow — they bring expertise to a task.
+
+Each agent file contains YAML frontmatter that defines its identity:
+
+```yaml
+---
+name: fastapi-pro
+description: "FastAPI expert. Use PROACTIVELY when building async Python APIs, implementing dependency injection, or designing OpenAPI schemas."
+model: sonnet
+color: green
+---
+```
+
+### Plugins vs agents
+
+You install plugins, not agents directly. A plugin bundles one or more related agents:
+
+| Plugin | Agents |
+|---|---|
+| `comprehensive-review` | `architect-review`, `code-reviewer`, `security-auditor` |
+| `javascript-typescript` | `javascript-pro`, `typescript-pro` |
+| `python-development` | `python-pro`, `django-pro`, `fastapi-pro` |
+| `blockchain-web3` | `blockchain-developer` |
+
+```bash
+# Wrong — agent names cannot be installed directly
+/plugin install typescript-pro
+
+# Correct — install the containing plugin
+/plugin install javascript-typescript
+```
+
+### Model tiers
+
+Agents are assigned to one of four model tiers based on the cognitive demands of their work:
+
+| Tier | Model | Agents | Typical work |
+|---|---|---|---|
+| Tier 1 | Opus 4.6 | 42 | Architecture decisions, security audits, all code review, production coding |
+| Tier 2 | Inherit | 42 | Complex tasks — your session's default model is used |
+| Tier 3 | Sonnet 4.6 | 51 | Docs, testing, debugging, API tooling, legacy code, payments |
+| Tier 4 | Haiku 4.5 | 18 | Fast ops: SEO, deployment, simple docs, content, search |
+
+**Tier 2 (`inherit`)** is flexible: the agent uses whatever model you start your Claude Code session with. Set it at session start:
+
+```bash
+claude --model opus   # all inherit-tier agents use Opus
+claude --model sonnet # all inherit-tier agents use Sonnet
+```
+
+Opus 4.6 achieves 80.8% on SWE-bench and uses 65% fewer tokens on complex tasks, often offsetting its higher per-token cost for architecture and security work.
+
+## Skills
+
+A skill is a modular knowledge package. It provides an agent with deep, domain-specific expertise without loading that knowledge into context permanently.
+
+Skills use **progressive disclosure** — a three-tier architecture that loads only what is needed:
+
+1. **Metadata** (frontmatter) — the skill's name and activation criteria. Always loaded, near-zero token cost.
+2. **Instructions** — core guidance, patterns, and examples. Loaded when the skill activates.
+3. **Resources** — reference material, templates, and extended examples. Loaded on demand.
+
+A skill that is never triggered adds virtually no token cost.
+
+```
+skills/async-python-patterns/
+├── SKILL.md              # Frontmatter + core instructions
+└── references/
+    └── asyncio-patterns.md   # Loaded on demand
+```
+
+Skills activate automatically when their trigger conditions are met:
+
+```yaml
+---
+name: async-python-patterns
+description: "Use this skill when implementing AsyncIO, async/await patterns, concurrent tasks, or Python async frameworks."
+---
+```
+
+### Example: skill activation in practice
+
+```
+User: "Set up FastAPI project with async patterns"
+  → Triggers: async-python-patterns skill (loads AsyncIO guidance)
+  → Triggers: fastapi-templates skill (loads FastAPI patterns)
+  → Invokes: /python-development:python-scaffold
+  → Result: production-ready FastAPI project with best practices
+
+User: "Implement Kubernetes deployment with Helm"
+  → Triggers: helm-chart-scaffolding skill
+  → Triggers: k8s-manifest-generator skill
+  → Guides: kubernetes-architect agent
+  → Result: production-grade K8s manifests with Helm charts
+```
+
+Notable skill collections:
+
+- **Python** (5 skills): async patterns, testing, packaging, performance, UV package manager
+- **JavaScript/TypeScript** (4 skills): advanced types, Node.js patterns, testing, modern ES6+
+- **Kubernetes** (4 skills): manifests, Helm charts, GitOps, security policies
+- **LLM Applications** (8 skills): LangGraph, prompt engineering, RAG, evaluation, embeddings, similarity search, vector tuning, hybrid search
+
+## Commands
+
+A command is an executable entry point — a slash command you invoke directly to run a structured workflow or trigger a tool. Commands are the "what to do" interface.
+
+### Command format
+
+```bash
+/plugin-name:command-name [arguments]
+```
+
+### Types of commands
+
+**Scaffolding commands** generate project structure:
+
+```bash
+/python-development:python-scaffold fastapi-microservice
+/javascript-typescript:typescript-scaffold    # Next.js/React + Vite
+/systems-programming:rust-project             # Rust project scaffolding
+```
+
+**Workflow orchestrators** coordinate multiple agents in sequence:
+
+```bash
+# Coordinates: backend-architect → database-architect → frontend-developer
+# → test-automator → security-auditor → deployment-engineer → observability-engineer
+/full-stack-orchestration:full-stack-feature "user authentication with OAuth2"
+```
+
+**Analysis and review commands** run targeted inspections:
+
+```bash
+/comprehensive-review:full-review             # multi-perspective code analysis
+/security-scanning:security-hardening --depth comprehensive
+/security-scanning:security-sast              # static application security testing
+/unit-testing:test-generate src/api/users.py
+```
+
+**TDD workflow commands** enforce test-driven discipline:
+
+```bash
+/tdd-workflows:tdd-red "user can reset password"   # write failing test
+/tdd-workflows:tdd-green                             # implement to pass
+/tdd-workflows:tdd-refactor                          # clean up
+```
+
+### Natural language alternative
+
+Every command task can also be expressed in natural language — Claude Code selects and coordinates the right agents automatically:
+
+```
+"Perform a comprehensive security audit and implement OWASP best practices"
+"Build a customer churn prediction model with deployment"
+"Debug production memory leak and create a runbook"
+```
+
+Use slash commands when you want direct, structured invocation with explicit parameters. Use natural language for exploratory or context-dependent work.
+
+## How they compose
+
+The four primitives combine into a layered system:
+
+```
+Plugin (installation unit)
+└── Agent (domain specialist)
+    ├── Skill (knowledge on demand)
+    └── Command (executable entry point)
+```
+
+A concrete example with the `python-development` plugin:
+
+```
+/plugin install python-development
+  → loads: python-pro, django-pro, fastapi-pro agents
+  → loads: python-scaffold command
+  → makes available: 16 Python skills (not yet loaded)
+
+/python-development:python-scaffold fastapi-microservice
+  → invokes: python-scaffold command
+  → activates: fastapi-pro agent (Opus model)
+  → triggers: async-python-patterns skill
+  → triggers: python-testing-patterns skill
+  → result: production-ready FastAPI project
+```
+
+<CardGroup cols={2}>
+  <Card title="Plugin catalog" icon="puzzle-piece" href="/plugins/catalog">
+    Browse all 77 plugins across 24 categories.
+  </Card>
+  <Card title="Agent catalog" icon="robot" href="/agents/catalog">
+    Explore all 182 agents, model tiers, and containing plugins.
+  </Card>
+</CardGroup>

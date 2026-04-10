@@ -1,0 +1,220 @@
+---
+title: "Add a new plugin to Claude Code Agents marketplace"
+description: "Step-by-step guide to creating and contributing a new plugin with agents, commands, and skills to the Claude Code Agents marketplace."
+---
+
+Contributing a plugin means adding a focused, single-purpose bundle of agents, commands, and skills to the `wshobson/agents` marketplace. Once added, any Claude Code user who runs `/plugin marketplace add wshobson/agents` can install your plugin with a single command and get your agents and tools loaded into their session. Plugins are isolated by design — yours will never interfere with other plugins, and users pay only the token cost of what they install.
+
+## Plugin anatomy
+
+A plugin is a directory under `plugins/` with this structure:
+
+```
+plugins/my-plugin/
+├── .claude-plugin/
+│   └── plugin.json          # Required — plugin manifest
+├── agents/                  # Optional — one .md file per agent
+│   └── my-agent.md
+├── commands/                # Optional — one .md file per command
+│   └── my-command.md
+└── skills/                  # Optional — one directory per skill
+    └── my-skill/
+        └── SKILL.md
+```
+
+Every plugin must have at least one agent **or** one command. Skills are always optional.
+
+## Creating a plugin
+
+<Steps>
+  <Step title="Create the plugin directory structure">
+    Choose a name that is lowercase, hyphen-separated, and describes a single domain:
+
+    ```bash
+    mkdir -p plugins/my-plugin/.claude-plugin
+    mkdir -p plugins/my-plugin/agents
+    mkdir -p plugins/my-plugin/commands
+    mkdir -p plugins/my-plugin/skills
+    ```
+
+    Good plugin names: `database-migrations`, `frontend-mobile-security`, `python-development`
+
+    Avoid generic names like `utilities` or `helpers` — each plugin should have a clear, focused purpose describable in 5–10 words.
+  </Step>
+
+  <Step title="Add plugin.json">
+    Create `.claude-plugin/plugin.json`. Only `name` is required — agents, commands, and skills are auto-discovered from the directory structure:
+
+    ```json
+    { "name": "my-plugin" }
+    ```
+
+    Claude Code discovers all `.md` files in `agents/` and `commands/`, and all directories in `skills/` automatically. You never need to list them manually in `plugin.json`.
+  </Step>
+
+  <Step title="Create agents">
+    Each agent is a Markdown file with YAML frontmatter followed by a system prompt. Create `agents/my-agent.md`:
+
+    ```markdown
+    ---
+    name: my-agent
+    description: "Expert in [domain]. Use PROACTIVELY when [trigger conditions]."
+    model: opus
+    color: blue
+    tools: Read, Grep, Glob
+    ---
+
+    You are an expert in [domain]...
+
+    ## Purpose
+
+    [What the agent does and when to use it]
+
+    ## Capabilities
+
+    [Detailed capability sections]
+    ```
+
+    **Required frontmatter fields:**
+    - `name` — hyphen-case identifier matching the filename
+    - `description` — what the agent does; must include trigger conditions (the phrase "Use PROACTIVELY when" or "Use when" is required)
+    - `model` — one of `opus`, `sonnet`, `haiku`, or `inherit`
+
+    **Optional fields:**
+    - `color` — `blue`, `green`, `red`, `yellow`, `cyan`, or `magenta`
+    - `tools` — comma-separated list to restrict available tools (e.g., `Read, Grep, Glob` for read-only agents)
+
+    See [Authoring Agents](/contributing/authoring-agents) for full guidance on writing effective agents.
+  </Step>
+
+  <Step title="Optionally add commands">
+    Commands are slash commands that users invoke directly. Create `commands/my-command.md`:
+
+    ```markdown
+    ---
+    description: What this command does
+    argument-hint: <target> [--flag value]
+    ---
+
+    # My Command
+
+    [Command implementation — instructions for Claude to follow when the
+     command is invoked, including step-by-step workflows, agent orchestration
+     via the Task tool, and output file locations]
+    ```
+
+    Commands are invoked as `/my-plugin:my-command [arguments]`. The `$ARGUMENTS` variable in the command body is replaced with whatever the user passes.
+  </Step>
+
+  <Step title="Optionally add skills">
+    Skills are modular knowledge packages with progressive disclosure. Create `skills/my-skill/SKILL.md`:
+
+    ```markdown
+    ---
+    name: my-skill
+    description: "Use this skill when [specific trigger conditions]."
+    ---
+
+    # My Skill
+
+    [Core guidance — this loads when the skill is activated]
+
+    ## Patterns
+
+    [Key patterns and examples]
+    ```
+
+    For large skills (approaching 600 lines), move supplementary material to a `references/` subdirectory:
+
+    ```
+    skills/my-skill/
+    ├── SKILL.md              # Core content (200–600 lines ideal)
+    ├── references/
+    │   └── advanced-patterns.md
+    └── assets/
+        └── template.yaml
+    ```
+
+    The `description` field must include a "Use when…" trigger phrase — the static analyzer flags `MISSING_TRIGGER` as an anti-pattern that reduces your plugin's quality score.
+  </Step>
+
+  <Step title="Update marketplace.json">
+    Register your plugin in `.claude-plugin/marketplace.json`. Add an entry to the `plugins` array:
+
+    ```json
+    {
+      "plugins": [
+        {
+          "name": "my-plugin",
+          "path": "./plugins/my-plugin",
+          "agents": [
+            "./agents/my-agent.md"
+          ],
+          "commands": [
+            "./commands/my-command.md"
+          ],
+          "skills": [
+            "./skills/my-skill"
+          ]
+        }
+      ]
+    }
+    ```
+
+    Note: skills are listed as directory paths (e.g., `./skills/my-skill`), not as paths to `SKILL.md`.
+  </Step>
+</Steps>
+
+## File structure reference
+
+A complete example plugin with one agent, one command, and one skill:
+
+```
+plugins/data-validation/
+├── .claude-plugin/
+│   └── plugin.json
+│       → { "name": "data-validation" }
+│
+├── agents/
+│   └── data-validator.md
+│       → name: data-validator
+│       → description: "Expert data validation... Use PROACTIVELY when..."
+│       → model: sonnet
+│
+├── commands/
+│   └── validate-schema.md
+│       → description: Validate data schemas against rules
+│       → argument-hint: <schema-path> [--strict]
+│
+└── skills/
+    └── validation-patterns/
+        ├── SKILL.md
+        │   → name: validation-patterns
+        │   → description: "Use when validating data schemas..."
+        └── references/
+            └── common-patterns.md
+```
+
+## Quality standards
+
+Before submitting, verify your plugin meets these standards:
+
+- **Clear naming** — hyphen-case, immediately descriptive without an explanation
+- **Focused scope** — single responsibility; if you can't describe the plugin in 5–10 words, split it
+- **Trigger phrases** — every agent description and skill description must say "Use when" or "Use PROACTIVELY when" with specific conditions
+- **Complete documentation** — agents need purpose, capabilities, and example interactions; skills need a clear activation trigger
+- **Tested functionality** — verify the agent and commands work as expected before committing
+- **Spec compliance** — agent and skill files must follow the [CLAUDE.md](/contributing/authoring-agents) conventions
+
+Run [PluginEval](/contributing/plugin-eval) to get an objective quality score before submitting a pull request:
+
+```bash
+cd plugins/plugin-eval
+uv run plugin-eval score ../my-plugin --depth standard
+```
+
+Aim for a Silver badge (≥70) at minimum. Gold (≥80) is the recommended bar for new contributions.
+
+<Note>
+The average plugin in the marketplace has 3.6 components (agents + commands + skills combined). If your plugin is growing beyond 8–10 components, consider splitting it into two focused plugins.
+</Note>

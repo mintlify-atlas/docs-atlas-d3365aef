@@ -1,24 +1,11 @@
 {
-  "$schema": "https://mintlify.com/docs.json",
-  "name": "Claude Code Agents",
+  "projectType": "framework",
+  "projectName": "Claude Code Agents",
+  "projectDescription": "A comprehensive marketplace of 77 Claude Code plugins, 182 specialized AI agents, 149 skills, and 96 commands for intelligent automation and multi-agent orchestration in software development.",
   "theme": "palm",
-  "colors": {
-    "primary": "#87a07c",
-    "light": "#325d3f",
-    "dark": "#eef1e8"
-  },
-  "favicon": "https://media.brand.dev/418e95ee-6688-4a34-baf5-b4491fd3d322.png",
-  "navbar": {
-    "primary": {
-      "type": "github",
-      "href": "https://github.com/wshobson/agents"
-    }
-  },
-  "footer": {
-    "socials": {
-      "github": "https://github.com/wshobson/agents"
-    }
-  },
+  "primaryColor": "#87a07c",
+  "lightColor": "#325d3f",
+  "darkColor": "#eef1e8",
   "navigation": {
     "tabs": [
       {
@@ -97,5 +84,31 @@
         ]
       }
     ]
-  }
+  },
+  "keyFeatures": [
+    "77 focused, single-purpose plugins with minimal token usage",
+    "182 specialized AI agents organized across 24 categories",
+    "149 agent skills with progressive disclosure architecture",
+    "16 multi-agent workflow orchestrators for complex operations",
+    "96 slash commands for direct invocation of tools and workflows",
+    "Three-tier model strategy (Opus/Sonnet/Haiku) for performance and cost optimization",
+    "PluginEval quality evaluation framework with three-layer scoring",
+    "Granular, composable design — install only what you need"
+  ],
+  "publicApiSurface": [
+    "/plugin marketplace add wshobson/agents",
+    "/plugin install <plugin-name>",
+    "/plugin-name:command-name [arguments]",
+    "/full-stack-orchestration:full-stack-feature",
+    "/security-scanning:security-hardening",
+    "/unit-testing:test-generate",
+    "/tdd-workflows:tdd-cycle",
+    "/comprehensive-review:full-review",
+    "/backend-development:feature-development",
+    "/python-development:python-scaffold",
+    "/kubernetes-operations:k8s-deploy",
+    "uv run plugin-eval score <path> --depth quick|standard",
+    "uv run plugin-eval certify <path>",
+    "uv run plugin-eval compare <path-a> <path-b>"
+  ]
 }

@@ -1,0 +1,72 @@
+---
+title: "Claude Code Agents: intelligent automation for devs"
+description: "A production-ready marketplace of 77 plugins, 182 specialized AI agents, and 149 skills for intelligent automation across modern software development."
+---
+
+Claude Code Agents is a production-ready plugin marketplace that brings deep, domain-specific AI expertise directly into your Claude Code workflow. Rather than loading a monolithic assistant, you install only the focused plugins you need — each one bundling specialized agents, slash commands, and progressive-disclosure skills tailored to a single purpose.
+
+<CardGroup cols={2}>
+  <Card title="Quickstart" icon="rocket" href="/quickstart">
+    Add the marketplace and install your first plugin in two steps.
+  </Card>
+  <Card title="Plugin catalog" icon="puzzle-piece" href="/plugins/catalog">
+    Browse all 77 plugins across 24 categories.
+  </Card>
+  <Card title="Agent catalog" icon="robot" href="/agents/catalog">
+    Explore all 182 specialized agents and their model tiers.
+  </Card>
+  <Card title="Core concepts" icon="book-open" href="/concepts">
+    Understand plugins, agents, skills, and commands.
+  </Card>
+</CardGroup>
+
+## What is Claude Code Agents?
+
+Claude Code Agents is a unified repository of **77 focused plugins** organized into 24 categories. Each plugin is a self-contained unit: install it and only its specific agents, commands, and skills load into Claude's context. Install nothing and nothing loads — no wasted tokens.
+
+The system ships with:
+
+- **77 plugins** — granular, single-purpose units optimized for minimal token usage
+- **182 specialized agents** — domain experts across architecture, languages, infrastructure, quality, data/AI, documentation, business, and SEO
+- **149 agent skills** — modular knowledge packages with progressive disclosure
+- **16 workflow orchestrators** — multi-agent coordination for full-stack development, security hardening, ML pipelines, and incident response
+- **96 commands** — project scaffolding, security scanning, test automation, and infrastructure setup
+
+## What makes it unique
+
+**Granular by design.** The average plugin contains 3.6 components (agents + commands + skills), following Anthropic's recommended 2–8 component range. This keeps each plugin focused, fast to load, and easy to compose.
+
+**Progressive disclosure for skills.** Skills use a three-tier architecture — metadata is always loaded, core instructions activate on demand, and reference resources load only when needed. A skill that is never triggered adds virtually zero token cost.
+
+**Three-tier model strategy.** Agents are assigned to Opus, Sonnet, or Haiku based on the cognitive demands of their work. Architecture and security reviews use Opus 4.6 (80.8% SWE-bench score). Documentation and testing use Sonnet. Fast operational tasks use Haiku. A fourth `inherit` tier lets you override the model at session start for cost control.
+
+**Install only what you need.** Installing `python-development` loads 3 Python agents, 1 scaffolding command, and makes 16 skills available — approximately 1,000 tokens. The other 76 plugins remain inert until you install them.
+
+## Key use cases
+
+| Use case | Plugins involved |
+|---|---|
+| Full-stack feature development | `full-stack-orchestration`, `backend-development`, `javascript-typescript` |
+| Security hardening | `security-scanning`, `security-compliance` |
+| Python microservice scaffolding | `python-development` |
+| Kubernetes deployment | `kubernetes-operations`, `cloud-infrastructure` |
+| ML pipeline development | `machine-learning-ops`, `llm-application-dev` |
+| Code review | `comprehensive-review` |
+| Incident response | `incident-response` |
+
+## Plugin categories
+
+The 77 plugins span 24 categories, including:
+
+- **Languages** (10) — Python, JavaScript/TypeScript, systems, JVM, scripting, functional, embedded
+- **Infrastructure** (5) — deployment, validation, Kubernetes, cloud, CI/CD
+- **Security** (6) — scanning, compliance, backend/API, frontend/mobile
+- **AI & ML** (5) — LLM apps, agent orchestration, context management, MLOps
+- **Workflows** (5) — git, full-stack, TDD, Conductor, Agent Teams
+- **Operations** (4) — incident response, diagnostics, distributed debugging, observability
+
+See the [plugin catalog](/plugins/catalog) for the full list.
+
+## Get started
+
+The fastest path to your first working agent is the [quickstart](/quickstart) — you'll have a plugin installed and ready to use in under two minutes.

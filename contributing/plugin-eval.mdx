@@ -1,0 +1,263 @@
+---
+title: "PluginEval: measure and certify plugin quality"
+description: "Use PluginEval to score, compare, and certify Claude Code plugins and skills across 10 quality dimensions with three evaluation layers."
+---
+
+PluginEval is the quality evaluation framework for Claude Code Agents plugins and skills. It combines deterministic static analysis, LLM-based semantic judging, and Monte Carlo simulation to answer one question: **"How good is this plugin or skill?"** The result is a calibrated score from 0–100, a letter grade, a quality badge (Bronze through Platinum), and a specific list of what to fix.
+
+## Installation
+
+PluginEval lives in `plugins/plugin-eval/` and uses [uv](https://docs.astral.sh/uv/) for dependency management:
+
+```bash
+cd plugins/plugin-eval
+
+# Core dependencies (static analysis only — no API key required)
+uv sync
+
+# With LLM judge support (Layers 2 & 3)
+uv sync --extra llm
+
+# With direct Anthropic API support
+uv sync --extra api
+
+# With dev dependencies (tests, linting)
+uv sync --extra dev
+```
+
+**Requirements:** Python ≥ 3.12, uv, pydantic, typer, rich, pyyaml
+
+LLM layers require either `claude-agent-sdk` (uses Claude Code Max plan by default) or `anthropic` SDK with `ANTHROPIC_API_KEY`.
+
+## The three evaluation layers
+
+PluginEval runs up to three layers of analysis, from instant and free to thorough and statistically rigorous.
+
+### Layer 1: Static analysis
+
+**Speed:** Under 2 seconds. **Cost:** Free. **Always runs.**
+
+Deterministic structural analysis of your plugin files. Runs six sub-checks:
+
+| Sub-check | Weight | What it measures |
+|---|---|---|
+| `frontmatter_quality` | 35% | Name validity, description length, trigger-phrase quality ("Use when…", "Use PROACTIVELY") |
+| `orchestration_wiring` | 25% | Output/input documentation, code examples, orchestrator anti-pattern detection |
+| `progressive_disclosure` | 15% | Line count vs. sweet spot (200–600 lines), presence of `references/` and `assets/` directories |
+| `structural_completeness` | 10% | Heading density, code blocks, examples section, troubleshooting section |
+| `token_efficiency` | 10% | MUST/NEVER/ALWAYS directive density, duplicate-line detection |
+| `ecosystem_coherence` | 5% | Cross-references to other skills/agents, "related"/"see also" mentions |
+
+Also detects anti-patterns and applies a multiplicative penalty to the final score.
+
+### Layer 2: LLM judge
+
+**Speed:** ~30 seconds. **Cost:** 4 LLM calls (Haiku + Sonnet). **Requires `claude-agent-sdk`.**
+
+Uses Claude as a semantic evaluator across 4 dimensions with anchored rubrics:
+
+| Dimension | Model | Method |
+|---|---|---|
+| `triggering_accuracy` | Haiku | Generates 10 synthetic prompts (5 should-trigger, 5 should-not), computes F1 score |
+| `orchestration_fitness` | Sonnet | Rates worker-vs-orchestrator role using 5-point anchored rubric |
+| `output_quality` | Sonnet | Simulates 3 realistic tasks and evaluates expected output quality |
+| `scope_calibration` | Sonnet | Rates scope appropriateness using 5-point anchored rubric |
+
+All four assessments run concurrently with semaphore-based throttling.
+
+### Layer 3: Monte Carlo simulation
+
+**Speed:** ~2–5 minutes. **Cost:** 50–100 LLM calls. **Requires `claude-agent-sdk`.**
+
+Generates 15 varied prompts via Haiku, then runs N simulations to compute statistical reliability:
+
+| Metric | Statistical method |
+|---|---|
+| Activation rate | Wilson score confidence interval |
+| Output consistency | Bootstrap CI (1,000 resamples) |
+| Failure rate | Clopper-Pearson exact CI |
+| Token efficiency | Normalized against 8,000-token cap |
+
+## CLI commands
+
+### `score` — Evaluate a plugin or skill
+
+```bash
+# Quick evaluation (static only, < 2 seconds, free)
+uv run plugin-eval score path/to/skill --depth quick
+
+# Standard evaluation (static + LLM judge, ~30 seconds)
+uv run plugin-eval score path/to/skill --depth standard
+
+# Deep evaluation (all three layers, ~3 minutes)
+uv run plugin-eval score path/to/skill --depth deep
+
+# Thorough evaluation (all layers, 100 Monte Carlo runs, ~6 minutes)
+uv run plugin-eval score path/to/skill --depth thorough
+```
+
+**Output format options:**
+
+```bash
+uv run plugin-eval score path/to/skill --output json
+uv run plugin-eval score path/to/skill --output markdown
+uv run plugin-eval score path/to/skill --output html
+```
+
+**CI gate — fail if below threshold:**
+
+```bash
+# Exits with code 1 if score < 70
+uv run plugin-eval score path/to/skill --threshold 70
+```
+
+### `certify` — Full certification with badge
+
+Runs at `deep` depth (all three layers). Produces a certification report with badge assignment:
+
+```bash
+uv run plugin-eval certify path/to/skill
+uv run plugin-eval certify path/to/skill --output markdown
+```
+
+### `compare` — Head-to-head comparison
+
+Compare two skills side-by-side across all dimensions:
+
+```bash
+uv run plugin-eval compare path/to/skill-a path/to/skill-b
+```
+
+### `init` — Build corpus for Elo ranking
+
+Index all skills in a plugins directory to enable Elo ranking:
+
+```bash
+uv run plugin-eval init plugins/ --corpus-dir ~/.plugineval/corpus
+```
+
+## Evaluation depths
+
+| Depth | Layers | Confidence label | Time | Cost |
+|---|---|---|---|---|
+| `quick` | Static only | Estimated | < 2s | Free |
+| `standard` | Static + Judge | Assessed | ~30s | 4 LLM calls |
+| `deep` | Static + Judge + Monte Carlo (50 runs) | Certified | ~3 min | ~54 LLM calls |
+| `thorough` | Static + Judge + Monte Carlo (100 runs) | Certified+ | ~6 min | ~104 LLM calls |
+
+## The 10 quality dimensions
+
+Every plugin and skill is scored across 10 dimensions. The composite score is a weighted sum:
+
+```
+Final = Σ(dimension_weight × blended_score) × 100 × anti_pattern_penalty
+```
+
+| Dimension | Weight | What it measures |
+|---|---|---|
+| `triggering_accuracy` | **25%** | Does the description fire for the right prompts and not for irrelevant ones? |
+| `orchestration_fitness` | **20%** | Is the skill a composable worker, not an orchestrator trying to do everything? |
+| `output_quality` | **15%** | Would it produce correct, useful, production-ready output? |
+| `scope_calibration` | **12%** | Is the scope well-sized — neither too narrow nor too broad for its domain? |
+| `progressive_disclosure` | **10%** | Does it use `references/` for large content and stay within the 200–600 line sweet spot? |
+| `token_efficiency` | **6%** | Is it concise? Low MUST/NEVER/ALWAYS density, no repeated content. |
+| `robustness` | **5%** | Does it handle varied inputs reliably without failing unexpectedly? |
+| `structural_completeness` | **3%** | Does it have proper headings, code blocks, and examples? |
+| `code_template_quality` | **2%** | Are code examples syntactically correct and production-ready? |
+| `ecosystem_coherence` | **2%** | Does it link to related skills and agents? |
+
+`triggering_accuracy` (25%) and `orchestration_fitness` (20%) together account for nearly half the score — invest most of your writing effort in the description and scope.
+
+## Quality badges
+
+| Badge | Score | Stars | Meaning |
+|---|---|---|---|
+| Platinum | ≥ 90 | ★★★★★ | Reference quality — exemplary in the marketplace |
+| Gold | ≥ 80 | ★★★★ | Production ready — recommended for contribution |
+| Silver | ≥ 70 | ★★★ | Functional but needs polish |
+| Bronze | ≥ 60 | ★★ | Minimum viable — ship only if addressing a gap |
+
+<Note>
+Badges require both a score threshold and an Elo rating threshold when corpus data is available. A new plugin without Elo history is scored by score alone.
+</Note>
+
+## Anti-patterns to avoid
+
+The static analyzer detects these patterns and applies a multiplicative penalty. Each anti-pattern reduces the final score by 5%, with a floor at 50%:
+
+| Anti-pattern | Penalty | Trigger |
+|---|---|---|
+| `OVER_CONSTRAINED` | −10% | More than 15 MUST/ALWAYS/NEVER directives |
+| `EMPTY_DESCRIPTION` | −10% | Description shorter than 20 characters |
+| `MISSING_TRIGGER` | −15% | No "Use when…" trigger phrase in description |
+| `BLOATED_SKILL` | −10% | More than 800 lines without a `references/` directory |
+| `ORPHAN_REFERENCE` | −5% | A link in `references/` points to a file that doesn't exist |
+| `DEAD_CROSS_REF` | −5% | A cross-reference to a skill or agent that doesn't exist in the marketplace |
+
+`MISSING_TRIGGER` carries the heaviest penalty (−15%) and is the most common issue for new contributors. Always include "Use when…" or "Use PROACTIVELY when…" in your description.
+
+## Using PluginEval in CI
+
+Add a quality gate to your pull request workflow:
+
+```yaml
+name: Plugin Quality Check
+on:
+  pull_request:
+    paths:
+      - 'plugins/**'
+
+jobs:
+  eval:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v3
+      - name: Install PluginEval
+        run: cd plugins/plugin-eval && uv sync
+      - name: Score changed plugins
+        run: |
+          cd plugins/plugin-eval
+          # Score at quick depth (free, no API key) — catches structural issues
+          uv run plugin-eval score ../../plugins/my-plugin --depth quick --threshold 60
+```
+
+For a thorough gate requiring a Silver badge, add LLM credentials and use `--depth standard --threshold 70`.
+
+## Running tests
+
+```bash
+cd plugins/plugin-eval
+
+# Run all tests
+uv run pytest
+
+# Run with coverage
+uv run pytest --cov=plugin_eval
+
+# Run static layer tests only (no LLM required)
+uv run pytest tests/test_static.py tests/test_parser.py
+
+# Run end-to-end tests against real plugins
+uv run pytest tests/test_e2e.py
+```
+
+## Claude Code integration
+
+PluginEval is also available as a Claude Code plugin with agents and slash commands:
+
+```bash
+/plugin install plugin-eval
+```
+
+| Command | Description |
+|---|---|
+| `/eval <path>` | Evaluate a plugin or skill (static + LLM judge) |
+| `/certify <path>` | Full certification pipeline with badge |
+| `/compare <a> <b>` | Head-to-head skill comparison |
+
+The `eval-orchestrator` agent (Opus) coordinates the evaluation, while `eval-judge` (Sonnet) handles the semantic scoring. The `evaluation-methodology` skill provides the full scoring rubric and improvement guidance when invoked.
+
+<Tip>
+Start with `--depth quick` during development — it runs in under 2 seconds and costs nothing. Switch to `--depth standard` before opening a pull request to catch semantic issues that static analysis misses. Reserve `--depth deep` for final certification of mature plugins.
+</Tip>

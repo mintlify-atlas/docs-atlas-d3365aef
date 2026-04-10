@@ -1,0 +1,218 @@
+---
+title: "Security hardening with multi-agent SAST and review"
+description: "Run comprehensive security audits using Claude Code Agents' security scanning, compliance, and code review agents with OWASP and dependency scanning."
+---
+
+The `security-scanning` plugin gives you a multi-agent security team that covers static analysis, dependency vulnerability scanning, threat modeling, compliance verification, and infrastructure hardening — all orchestrated from a single command. It combines the `security-auditor` agent (Claude Opus) with three targeted commands so you can run a quick SAST check or kick off a full 13-step hardening workflow with phase-gated approval checkpoints.
+
+## Install the plugin
+
+```bash
+/plugin install security-scanning
+```
+
+This loads the `security-auditor` and `threat-modeling-expert` agents, the three security commands, and the `sast-configuration` skill.
+
+## The security-auditor agent
+
+The `security-auditor` agent runs on **Claude Opus** because security audits are high-stakes, reasoning-intensive work. It covers the full DevSecOps surface:
+
+- OWASP Top 10 (2021) and ASVS assessment
+- SAST, DAST, IAST, and dependency scanning integration
+- Threat modeling with STRIDE and MITRE ATT&CK mapping
+- Compliance frameworks: GDPR, HIPAA, PCI-DSS, SOC 2, ISO 27001
+- Zero-trust architecture and OAuth 2.0/OIDC implementation
+- Container and Kubernetes security policies
+
+**Natural language triggers:**
+
+```
+"Perform security audit and implement OWASP best practices"
+"Conduct DevSecOps integration with security pipeline"
+"Implement zero-trust authentication with MFA"
+"Create GDPR-compliant data processing with privacy by design"
+```
+
+## Security commands
+
+### Comprehensive security hardening
+
+The flagship command — a 13-step orchestrated workflow with three human approval checkpoints:
+
+```bash
+/security-scanning:security-hardening --depth comprehensive
+```
+
+**Options:**
+
+```bash
+# Quick scan (OWASP only)
+/security-scanning:security-hardening
+
+# With specific compliance frameworks
+/security-scanning:security-hardening --depth comprehensive --compliance owasp,soc2,gdpr,hipaa
+```
+
+The workflow writes each step's output to `.security-hardening/` so you can review artifacts between phases. It never proceeds automatically past a checkpoint.
+
+### Static Application Security Testing (SAST)
+
+```bash
+/security-scanning:security-sast
+```
+
+Runs multi-language static analysis across your codebase:
+
+- **Python**: Bandit with OWASP and CVE rule sets
+- **JavaScript/TypeScript**: ESLint Security plugin
+- **Multi-language**: Semgrep with `auto`, `p/security-audit`, and `p/owasp-top-ten` rulesets
+- **Java**: SpotBugs; **Ruby**: Brakeman; **Go**: gosec; **Rust**: cargo-clippy
+
+The command auto-detects languages, runs all applicable tools, and produces a unified report with CVSS scores and CWE/OWASP mappings.
+
+### Dependency vulnerability scanning
+
+```bash
+/security-scanning:security-dependencies
+```
+
+Scans all detected package ecosystems for known vulnerabilities:
+
+| Ecosystem | Tool |
+|---|---|
+| npm / Node.js | `npm audit` |
+| Python | `safety`, `pip-audit` |
+| Go | `govulncheck` |
+| Rust | `cargo audit` |
+
+Produces a prioritized remediation plan, CycloneDX SBOM, and automation scripts for each ecosystem (`npm audit fix`, `pip-audit --fix`, etc.).
+
+## Complete security audit workflow
+
+<Steps>
+  <Step title="Install the plugin">
+    ```bash
+    /plugin install security-scanning
+    ```
+  </Step>
+
+  <Step title="Run SAST on your codebase">
+    ```bash
+    /security-scanning:security-sast
+    ```
+
+    Review the findings. The command groups results by severity (CRITICAL, HIGH, MEDIUM, LOW) and maps each to its CWE and OWASP Top 10 category.
+  </Step>
+
+  <Step title="Scan dependencies for known CVEs">
+    ```bash
+    /security-scanning:security-dependencies
+    ```
+
+    Focus on CRITICAL and HIGH findings first. The output includes the exact package versions to upgrade to and ready-to-run fix commands.
+  </Step>
+
+  <Step title="Run comprehensive hardening">
+    ```bash
+    /security-scanning:security-hardening --depth comprehensive
+    ```
+
+    The orchestrator runs four phases:
+
+    - **Phase 1** (Steps 1–3): Vulnerability scan → threat modeling → architecture review
+    - **Checkpoint 1**: Review findings, approve or request changes
+    - **Phase 2** (Steps 4–7): Critical fixes → backend hardening → frontend hardening → mobile hardening
+    - **Checkpoint 2**: Review remediation work
+    - **Phase 3** (Steps 8–10): Auth/authorization enhancement → infrastructure controls → secrets management
+    - **Checkpoint 3**: Review security controls
+    - **Phase 4** (Steps 11–13): Penetration testing → compliance verification → SIEM integration
+  </Step>
+
+  <Step title="Check compliance requirements">
+    For regulated industries, install the compliance plugin and run a targeted check:
+
+    ```bash
+    /plugin install security-compliance
+    /security-compliance:compliance-check --framework soc2
+    /security-compliance:compliance-check --framework hipaa
+    /security-compliance:compliance-check --framework gdpr
+    ```
+  </Step>
+
+  <Step title="Enhance pull request security">
+    Install the PR workflow plugin to add security review to every pull request:
+
+    ```bash
+    /plugin install git-pr-workflows
+    /git-pr-workflows:pr-enhance
+    ```
+
+    This adds security context, flags risky changes, and surfaces relevant OWASP guidance in PR descriptions.
+  </Step>
+</Steps>
+
+## Additional security plugins
+
+<CardGroup cols={2}>
+  <Card title="security-compliance" icon="clipboard-check">
+    Validates your codebase and infrastructure against SOC2, HIPAA, GDPR, and PCI-DSS requirements. Run `/security-compliance:compliance-check` to get a gap analysis with actionable remediation steps.
+  </Card>
+  <Card title="block-no-verify" icon="shield-halved">
+    Guards against `git commit --no-verify` bypass of pre-commit hooks. Install this plugin to enforce that security hooks cannot be skipped in your repository — a common attack vector in supply chain compromises.
+  </Card>
+  <Card title="backend-api-security" icon="lock">
+    Specialized security review for REST and GraphQL APIs. Covers OAuth scope validation, rate limiting, input sanitization, and API-specific OWASP risks that the general SAST command may not catch in full context.
+  </Card>
+  <Card title="frontend-mobile-security" icon="mobile">
+    XSS scanning, CSP policy generation, PKCE OAuth2 flows, and mobile-specific hardening (certificate pinning, biometric auth, ProGuard rules). Run `/frontend-mobile-security:xss-scan` for a targeted frontend audit.
+  </Card>
+</CardGroup>
+
+## CI/CD integration
+
+Add SAST and dependency scanning as pipeline gates:
+
+<Tabs>
+  <Tab title="GitHub Actions">
+    ```yaml
+    name: Security Scan
+    on:
+      pull_request:
+        branches: [main]
+
+    jobs:
+      sast:
+        runs-on: ubuntu-latest
+        steps:
+          - uses: actions/checkout@v4
+          - name: Install tools
+            run: pip install bandit semgrep && npm install -g eslint @eslint/plugin-security
+          - name: Run SAST
+            run: |
+              bandit -r . -f json -o bandit.json || true
+              semgrep --config=auto --json --output=semgrep.json || true
+          - uses: actions/upload-artifact@v4
+            with:
+              name: sast-reports
+              path: "*.json"
+    ```
+  </Tab>
+  <Tab title="GitLab CI">
+    ```yaml
+    sast:
+      stage: test
+      image: python:3.12
+      script:
+        - pip install bandit semgrep
+        - bandit -r . -f json -o bandit.json || true
+        - semgrep --config=auto --json --output=semgrep.json || true
+      artifacts:
+        reports:
+          sast: bandit.json
+    ```
+  </Tab>
+</Tabs>
+
+<Warning>
+The `security-hardening` command creates a `.security-hardening/` directory in your working directory containing detailed vulnerability reports. Do not commit this directory to version control — add it to `.gitignore`.
+</Warning>

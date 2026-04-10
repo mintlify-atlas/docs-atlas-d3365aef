@@ -1,0 +1,279 @@
+---
+title: "Author effective agents for Claude Code plugins"
+description: "Learn how to write high-quality Claude Code agent definitions with proper frontmatter, system prompts, model selection, and skill integration."
+---
+
+An agent in Claude Code Agents is a Markdown file that combines YAML frontmatter (metadata and configuration) with a system prompt (what the agent knows and how it behaves). When a user installs your plugin, Claude Code reads the frontmatter to decide when to use the agent and which model to run it on. The system prompt then shapes everything the agent says and does in that session. Getting both parts right is what separates a useful agent from one that gets ignored or misused.
+
+## Agent file format
+
+Every agent lives at `plugins/<plugin-name>/agents/<agent-name>.md` and follows this structure:
+
+```markdown
+---
+name: agent-name
+description: "What this agent does. Use PROACTIVELY when [trigger conditions]."
+model: opus|sonnet|haiku|inherit
+color: blue|green|red|yellow|cyan|magenta
+tools: Read, Grep, Glob
+---
+
+[System prompt content begins here — no heading required]
+```
+
+## Frontmatter fields
+
+### `name` (required)
+
+The agent's identifier. Must be lowercase and hyphen-separated, matching the filename without the `.md` extension.
+
+```yaml
+name: kubernetes-architect       # ✅ correct
+name: KubernetesArchitect        # ❌ wrong — no camelCase
+name: kubernetes architect       # ❌ wrong — no spaces
+```
+
+### `description` (required)
+
+The most important field. Claude Code reads this to decide whether to invoke your agent for a given user request. A weak description means the agent is never used; an overly broad description means it activates when it shouldn't.
+
+**The description must:**
+- Summarize what the agent does (1–2 sentences)
+- Include an explicit trigger phrase using `Use PROACTIVELY when` or `Use when` with specific conditions
+
+```yaml
+# ✅ Good — specific domain and explicit trigger
+description: "Expert Kubernetes architect specializing in cloud-native infrastructure,
+  advanced GitOps workflows (ArgoCD/Flux), and enterprise container orchestration.
+  Use PROACTIVELY for K8s architecture, GitOps implementation, or cloud-native
+  platform design."
+
+# ❌ Bad — no trigger phrase, too vague
+description: "Helps with Kubernetes."
+
+# ❌ Bad — trigger is too broad (activates for unrelated requests)
+description: "Expert in infrastructure. Use when doing any technical work."
+```
+
+Keep descriptions under 1024 characters. The static analyzer flags descriptions shorter than 20 characters as `EMPTY_DESCRIPTION` and descriptions without a trigger phrase as `MISSING_TRIGGER` — both reduce your plugin's quality score.
+
+### `model` (required)
+
+Sets the Claude model for the agent. Choose based on what the agent actually needs to do:
+
+| Value | Model | When to use |
+|---|---|---|
+| `opus` | Claude Opus 4.6 | Architecture decisions, security audits, critical code review, complex reasoning requiring deep expertise |
+| `sonnet` | Claude Sonnet 4.6 | Documentation generation, testing, debugging, API docs, support workflows requiring intelligence but not peak reasoning |
+| `haiku` | Claude Haiku 4.5 | Fast operational tasks: SEO, deployment pipelines, simple scaffolding, content generation, deterministic outputs |
+| `inherit` | Session default | Complex tasks where the user should choose — AI/ML work, frontend/mobile development, specialized domains |
+
+**Model selection criteria:**
+
+Use `opus` when:
+- The agent makes architectural or security decisions with broad consequences
+- Wrong answers are costly and hard to detect (security audits, production deployments)
+- The task requires synthesizing information across many domains simultaneously
+- The agent is positioned as Tier 1 critical work in your plugin
+
+Use `haiku` when:
+- The agent executes well-defined, repetitive tasks (generating tests from specs, scaffolding from templates)
+- Speed and cost matter more than depth
+- The output is mostly deterministic given the input
+
+Use `inherit` when:
+- Users will have strong preferences about model cost vs capability
+- The agent handles a diverse range of complexity (some requests need Opus, some are fine with Sonnet)
+- You want your plugin to work well across different user budgets
+
+```yaml
+model: opus     # kubernetes-architect — architecture decisions
+model: haiku    # deployment-engineer — pipeline YAML generation
+model: sonnet   # code-documenter — documentation writing
+model: inherit  # ml-engineer — users choose based on task complexity
+```
+
+### `color` (optional)
+
+Visual label in the Claude Code interface. One of: `blue`, `green`, `red`, `yellow`, `cyan`, `magenta`. Use color to signal the agent's category or risk level at a glance — for example, `red` for security or incident response agents, `green` for development tools.
+
+### `tools` (optional)
+
+Restricts which tools the agent can use. Omit this field to allow all tools. Use it when the agent should be read-only or when restricting tools improves safety:
+
+```yaml
+tools: Read, Grep, Glob           # Read-only code analysis agent
+tools: Read, Grep, Glob, WebFetch # Research agent that can also fetch URLs
+```
+
+Common tool values: `Read`, `Write`, `Edit`, `Bash`, `Grep`, `Glob`, `WebFetch`, `Task`
+
+## Writing the system prompt
+
+The system prompt follows the frontmatter and is everything after the `---` closing delimiter. It shapes the agent's behavior, knowledge, and communication style.
+
+### Recommended structure
+
+```markdown
+---
+[frontmatter]
+---
+
+[One-sentence statement of the agent's role]
+
+## Purpose
+
+[2–3 sentences expanding on what the agent does and why it exists]
+
+## Capabilities
+
+[Organized sections covering the agent's knowledge domains]
+
+### Domain 1
+
+- Bullet points with specifics
+
+### Domain 2
+
+- ...
+
+## Behavioral Traits
+
+- How the agent approaches problems
+- What it prioritizes
+
+## Response Approach
+
+1. Step-by-step methodology the agent follows
+
+## Example Interactions
+
+- "Example prompt that should trigger this agent"
+- "Another example prompt"
+```
+
+### Writing capability sections
+
+Be specific and comprehensive. A well-written capabilities section does two things: it tells Claude what it knows, and it helps Claude Code match the agent to user requests.
+
+```markdown
+## Capabilities
+
+### Modern Authentication & Authorization
+
+- **Identity protocols**: OAuth 2.0/2.1, OpenID Connect, SAML 2.0, WebAuthn, FIDO2
+- **JWT security**: Proper implementation, key management, token validation
+- **Zero-trust architecture**: Identity-based access, continuous verification
+- **Authorization patterns**: RBAC, ABAC, ReBAC, policy engines
+```
+
+### Behavioral traits
+
+Behavioral traits define the agent's values and defaults — what it always does and what it refuses to do:
+
+```markdown
+## Behavioral Traits
+
+- Implements defense-in-depth with multiple security layers
+- Applies principle of least privilege
+- Never trusts user input; validates everything at multiple layers
+- Focuses on practical, actionable fixes over theoretical risks
+- Integrates security early in the development lifecycle (shift-left)
+```
+
+### Example interactions
+
+Include 5–8 realistic example prompts that users might send when they want this agent. These help Claude Code learn the agent's trigger surface:
+
+```markdown
+## Example Interactions
+
+- "Conduct comprehensive security audit of microservices with DevSecOps integration"
+- "Implement zero-trust authentication with MFA and risk-based access"
+- "Design security pipeline with SAST, DAST, and container scanning for CI/CD"
+- "Create GDPR-compliant data processing system with privacy by design"
+```
+
+## A complete example
+
+```markdown
+---
+name: api-designer
+description: "Expert API designer specializing in REST and GraphQL design,
+  OpenAPI specification, versioning strategies, and developer experience.
+  Use PROACTIVELY when designing new APIs, reviewing API contracts, or
+  implementing API documentation."
+model: sonnet
+color: blue
+tools: Read, Grep, Glob
+---
+
+You are an API designer specializing in REST and GraphQL API design, OpenAPI
+specification authoring, and developer experience.
+
+## Purpose
+
+Expert API designer with deep knowledge of API design patterns, versioning
+strategies, and documentation standards. Specializes in creating APIs that
+are intuitive to use, easy to maintain, and well-documented.
+
+## Capabilities
+
+### REST API Design
+
+- **Resource modeling**: Noun-based URIs, hierarchical resources, collection patterns
+- **HTTP semantics**: Correct use of methods, status codes, and headers
+- **Versioning**: URL versioning, header versioning, content negotiation strategies
+- **Pagination**: Cursor-based, offset-based, keyset pagination with Link headers
+
+### OpenAPI Specification
+
+- **Schema design**: Request/response models, reusable components, discriminators
+- **Security schemes**: OAuth 2.0, API keys, HTTP bearer tokens
+- **Documentation**: Descriptions, examples, tags, and external references
+
+### GraphQL
+
+- **Schema design**: Types, queries, mutations, subscriptions, directives
+- **N+1 prevention**: DataLoader patterns, batch loading
+- **Authorization**: Field-level permissions, schema directives
+
+## Behavioral Traits
+
+- Designs APIs for the developer consuming them, not the system producing them
+- Always considers backward compatibility before suggesting changes
+- Documents edge cases and error responses, not just the happy path
+- Prefers explicit over implicit — clear naming beats clever naming
+
+## Response Approach
+
+1. **Understand the domain** — what resources exist and how they relate
+2. **Design the contract** — resource shapes, operations, and error responses
+3. **Write the spec** — produce OpenAPI YAML or GraphQL SDL
+4. **Document thoroughly** — examples for every endpoint and edge case
+5. **Review for DX** — would a new developer understand this without asking?
+
+## Example Interactions
+
+- "Design a REST API for a task management app with authentication"
+- "Review this OpenAPI spec and suggest improvements"
+- "Create GraphQL schema for an e-commerce platform"
+- "How should I version this API without breaking existing clients?"
+```
+
+## Quality standards checklist
+
+Before committing your agent, verify:
+
+- [ ] Description includes "Use PROACTIVELY when" or "Use when" with specific conditions
+- [ ] Description is between 20 and 1024 characters
+- [ ] Model choice is justified by the agent's task complexity
+- [ ] Capabilities are organized into named sections with specific bullet points
+- [ ] Behavioral traits define the agent's defaults and non-negotiables
+- [ ] Example interactions are realistic user prompts (not capability descriptions)
+- [ ] If `tools` is set, the restriction makes sense for the agent's purpose
+- [ ] The agent has a single, focused purpose (not a general-purpose assistant)
+
+<Tip>
+Run PluginEval on your agent file to get an objective quality score: `uv run plugin-eval score plugins/my-plugin --depth standard`. The `triggering_accuracy` dimension (25% weight) specifically measures whether your description fires for the right prompts.
+</Tip>

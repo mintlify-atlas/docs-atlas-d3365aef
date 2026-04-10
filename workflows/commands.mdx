@@ -1,0 +1,186 @@
+---
+title: "Command reference: all 96 slash commands by category"
+description: "Complete reference for all 96 Claude Code Agents slash commands organized by category — development, testing, security, infrastructure, and more."
+---
+
+Every installed plugin contributes namespaced slash commands to Claude Code. The full collection spans 96 commands across 12 functional categories — from scaffolding a new backend service to running a multi-framework compliance check. Each command follows the same format: `/plugin-name:command-name [arguments]`. Use `/plugin` at any time to list commands from your currently installed plugins.
+
+## Development & features
+
+| Command | Description |
+|---|---|
+| `/backend-development:feature-development <description>` | End-to-end backend feature development |
+| `/full-stack-orchestration:full-stack-feature <description> [--stack react/fastapi/postgres] [--api-style rest\|graphql] [--complexity simple\|medium\|complex]` | Complete full-stack feature implementation via 7-agent orchestration |
+| `/multi-platform-apps:multi-platform <description>` | Cross-platform app development coordination |
+| `/python-development:python-scaffold <template>` | FastAPI or Django project scaffolding |
+| `/javascript-typescript:typescript-scaffold <template>` | Next.js/React or Vite project setup |
+| `/systems-programming:rust-project <description>` | Rust project scaffolding |
+| `/frontend-mobile-development:component-scaffold <component> [description]` | React or React Native component scaffolding |
+
+## Testing & quality
+
+| Command | Description |
+|---|---|
+| `/unit-testing:test-generate [path]` | Generate comprehensive unit tests for a file or directory |
+| `/tdd-workflows:tdd-cycle <description>` | Complete TDD red-green-refactor cycle |
+| `/tdd-workflows:tdd-red <description>` | Write failing tests first |
+| `/tdd-workflows:tdd-green` | Implement code to make tests pass |
+| `/tdd-workflows:tdd-refactor` | Refactor with passing test suite |
+
+## Code quality & review
+
+| Command | Description |
+|---|---|
+| `/comprehensive-review:full-review` | Multi-perspective code analysis (architecture, security, performance) |
+| `/comprehensive-review:pr-enhance` | Enhance pull request with review feedback |
+
+## Debugging & troubleshooting
+
+| Command | Description |
+|---|---|
+| `/debugging-toolkit:smart-debug <description>` | Interactive smart debugging session |
+| `/incident-response:incident-response <description>` | Production incident management workflow |
+| `/incident-response:smart-fix <description>` | Automated incident resolution with root cause analysis |
+| `/error-debugging:error-analysis <description>` | Deep error analysis |
+| `/error-debugging:error-trace <description>` | Stack trace debugging |
+| `/error-diagnostics:smart-debug <description>` | Smart diagnostic debugging |
+| `/distributed-debugging:debug-trace <description>` | Distributed system tracing |
+
+## Security
+
+| Command | Description |
+|---|---|
+| `/security-scanning:security-hardening <target> [--depth quick\|standard\|comprehensive] [--compliance owasp,soc2,gdpr,hipaa,pci-dss]` | Comprehensive security hardening with defense-in-depth |
+| `/security-scanning:security-sast <target>` | Static application security testing (SAST) |
+| `/security-scanning:security-dependencies` | Dependency vulnerability scanning |
+| `/security-compliance:compliance-check <framework>` | SOC2, HIPAA, or GDPR compliance verification |
+| `/frontend-mobile-security:xss-scan <target>` | XSS vulnerability scanning for frontend and mobile |
+
+## Infrastructure & deployment
+
+| Command | Description |
+|---|---|
+| `/observability-monitoring:monitor-setup` | Set up monitoring infrastructure |
+| `/observability-monitoring:slo-implement <description>` | Implement SLO and SLI metrics |
+| `/deployment-validation:config-validate` | Pre-deployment configuration validation |
+| `/cicd-automation:workflow-automate <description>` | CI/CD pipeline automation |
+
+## Documentation
+
+| Command | Description |
+|---|---|
+| `/code-documentation:doc-generate [path]` | Generate comprehensive code documentation |
+| `/code-documentation:code-explain [path]` | Explain code functionality in plain language |
+| `/documentation-generation:doc-generate` | Generate OpenAPI specs, diagrams, and tutorials |
+| `/c4-architecture:c4-architecture` | Generate full C4 architecture documentation (Context, Container, Component, Code levels) |
+
+## Refactoring & maintenance
+
+| Command | Description |
+|---|---|
+| `/code-refactoring:refactor-clean <target>` | Code cleanup and refactoring |
+| `/code-refactoring:tech-debt <target>` | Technical debt identification and management |
+| `/codebase-cleanup:deps-audit` | Dependency auditing |
+| `/codebase-cleanup:tech-debt` | Technical debt reduction |
+| `/framework-migration:legacy-modernize <target>` | Legacy code modernization |
+| `/framework-migration:code-migrate <source> <target>` | Framework migration |
+| `/framework-migration:deps-upgrade` | Dependency upgrades |
+
+## Database
+
+| Command | Description |
+|---|---|
+| `/database-migrations:sql-migrations <description>` | SQL migration automation |
+| `/database-migrations:migration-observability` | Migration monitoring and observability |
+| `/database-cloud-optimization:cost-optimize` | Database and cloud cost optimization |
+
+## Git & PR workflows
+
+| Command | Description |
+|---|---|
+| `/git-pr-workflows:pr-enhance` | Enhance pull request quality |
+| `/git-pr-workflows:onboard` | Team onboarding automation |
+| `/git-pr-workflows:git-workflow <description>` | Git workflow automation |
+
+## AI & ML
+
+| Command | Description |
+|---|---|
+| `/llm-application-dev:langchain-agent <description>` | LangChain agent development |
+| `/llm-application-dev:ai-assistant <description>` | AI assistant implementation |
+| `/llm-application-dev:prompt-optimize <prompt>` | Prompt engineering optimization |
+| `/agent-orchestration:multi-agent-optimize` | Multi-agent system optimization |
+| `/agent-orchestration:improve-agent <description>` | Agent improvement workflows |
+| `/machine-learning-ops:ml-pipeline <description>` | ML training pipeline orchestration |
+| `/data-engineering:data-pipeline <description>` | ETL/ELT pipeline construction |
+| `/data-engineering:data-driven-feature <description>` | Data-driven feature development |
+
+## Performance
+
+| Command | Description |
+|---|---|
+| `/performance-testing-review:ai-review` | AI-powered performance analysis |
+| `/application-performance:performance-optimization <target>` | Application-level performance optimization |
+
+## Operations
+
+| Command | Description |
+|---|---|
+| `/team-collaboration:issue <description>` | Issue management automation |
+| `/team-collaboration:standup-notes` | Standup notes generation |
+| `/accessibility-compliance:accessibility-audit` | WCAG compliance auditing |
+| `/api-testing-observability:api-mock <description>` | API mocking and testing |
+| `/context-management:context-save` | Save current conversation context |
+| `/context-management:context-restore` | Restore a previously saved context |
+
+## Business & SEO
+
+| Command | Description |
+|---|---|
+| `/conductor:setup` | Interactive project setup — product vision, tech stack, and workflow rules |
+| `/conductor:new-track <description>` | Generate a specification and phased implementation plan |
+| `/conductor:implement` | Execute the current track with verification checkpoints |
+| `/conductor:revert <scope>` | Undo work by logical unit (track, phase, or task) |
+| `/conductor:status` | Display current project context and active track |
+| `/conductor:manage <action>` | Manage tracks and project state |
+
+## Agent teams
+
+| Command | Description |
+|---|---|
+| `/team-spawn <preset\|custom> [--name <name>] [--members <n>]` | Spawn a team using presets: `review`, `debug`, `feature`, `fullstack`, `research`, `security`, `migration` |
+| `/team-review <path> [--reviewers security,performance,architecture]` | Multi-reviewer parallel code review |
+| `/team-debug <description> [--hypotheses <n>]` | Hypothesis-driven debugging with parallel investigation |
+| `/team-feature <description> [--team-size <n>] [--plan-first]` | Parallel feature development with file ownership |
+| `/team-delegate [--rebalance]` | Task delegation dashboard and workload management |
+| `/team-status` | Display team members, tasks, and progress |
+| `/team-shutdown` | Gracefully shut down a team and release resources |
+
+## Plugin evaluation
+
+| Command | Description |
+|---|---|
+| `/eval <path> [--depth quick\|standard]` | Evaluate a plugin or skill with static and LLM analysis |
+| `/certify <path>` | Full certification across all three evaluation layers |
+| `/compare <path-a> <path-b>` | Compare two plugins or skills side by side |
+
+<Note>
+  The full count of 96 commands reflects all commands shipped with the marketplace. The exact commands available in your session depend on which plugins you have installed. Run `/plugin` to see your active command set.
+</Note>
+
+## Command arguments
+
+Commands accept free-form text arguments and structured flags. Flags use `--flag-name value` syntax:
+
+```bash
+# Free-form text argument
+/backend-development:feature-development OAuth2 integration with social login
+
+# Flag-based argument
+/security-scanning:security-hardening --depth comprehensive --compliance owasp,soc2
+
+# Combined
+/full-stack-orchestration:full-stack-feature "payment processing" --stack react/fastapi/postgres --api-style rest
+```
+
+Argument hints for each command are shown in the tables above using angle brackets for required values (`<value>`) and square brackets for optional values (`[value]`). The pipe character (`|`) separates mutually exclusive options.

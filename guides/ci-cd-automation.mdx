@@ -1,0 +1,202 @@
+---
+title: "CI/CD automation with intelligent pipeline agents"
+description: "Automate continuous integration and deployment pipelines using Claude Code Agents' CI/CD plugin with GitHub Actions, GitLab CI, and secrets management skills."
+---
+
+The `cicd-automation` plugin brings a team of deployment specialists into your Claude Code session. It includes five agents covering cloud architecture, deployment engineering, infrastructure-as-code, Kubernetes operations, and DevOps troubleshooting — paired with four skills that provide deep, on-demand expertise for pipeline design, GitHub Actions, GitLab CI, and secrets management.
+
+## Install the plugin
+
+```bash
+/plugin install cicd-automation
+```
+
+This loads five agents, one orchestration command (`workflow-automate`), and four specialized skills. Only this plugin's resources are added to your context.
+
+## Agents in this plugin
+
+| Agent | Model | Specialty |
+|---|---|---|
+| `deployment-engineer` | sonnet | CI/CD pipelines, containerisation, cloud deployments |
+| `cloud-architect` | opus | AWS/Azure/GCP infrastructure design and cost optimisation |
+| `devops-troubleshooter` | sonnet | Pipeline debugging, log analysis, incident resolution |
+| `kubernetes-architect` | opus | Kubernetes deployment patterns and progressive delivery |
+| `terraform-specialist` | sonnet | Infrastructure as Code with Terraform modules and state management |
+
+<Note>
+`cloud-architect` and `kubernetes-architect` run on Opus because infrastructure architecture decisions have long-lasting consequences. `deployment-engineer`, `devops-troubleshooter`, and `terraform-specialist` run on Sonnet for complex operational work.
+</Note>
+
+## The four CI/CD skills
+
+Skills are loaded with progressive disclosure: their trigger descriptions are always present in context, but the full skill content (patterns, templates, examples) is only pulled in when activated by a relevant request. This keeps token usage minimal.
+
+### deployment-pipeline-design
+
+Activated when you need to design or troubleshoot multi-stage CI/CD pipelines, implement canary rollouts, or set up environment promotion workflows.
+
+```
+"Design a zero-downtime deployment pipeline for a containerized microservice"
+"Set up canary rollout with automated rollback on error rate increase"
+"Create multi-environment promotion with manual approval gates"
+```
+
+The skill produces complete pipeline architecture: stage definitions, job dependencies, parallelism, caching strategy, deployment strategies (rolling, blue/green, canary), and health check configurations.
+
+### github-actions-templates
+
+Activated when you mention GitHub Actions or need to automate GitHub-based workflows.
+
+```
+"Create a GitHub Actions workflow for testing, building, and deploying to Kubernetes"
+"Set up reusable workflow templates for the whole organization"
+"Add matrix builds for multiple Node.js versions"
+```
+
+Provides production-ready workflow YAML for common patterns: container builds, registry pushes, Kubernetes deploys, SAST scanning, matrix testing, and environment-scoped deployments with protection rules.
+
+### gitlab-ci-patterns
+
+Activated when you mention GitLab CI or need to optimize GitLab-based pipelines.
+
+```
+"Build a GitLab CI pipeline with caching and distributed runners"
+"Implement GitOps deployment from GitLab to Kubernetes"
+"Optimize our GitLab pipeline — it takes 45 minutes"
+```
+
+Covers multi-stage pipeline organization, DAG pipelines, GitLab Runner configuration, artifact management, and environment-specific deploy jobs.
+
+### secrets-management
+
+Activated when you need to handle credentials, rotate secrets, or secure a CI/CD environment.
+
+```
+"Implement secrets management with HashiCorp Vault in our pipeline"
+"Rotate database credentials without downtime"
+"Remove hardcoded API keys from our GitHub Actions workflows"
+```
+
+Covers HashiCorp Vault integration, AWS Secrets Manager, native platform secrets (GitHub encrypted secrets, GitLab CI/CD variables), secret rotation policies, and least-privilege IAM role definitions.
+
+## Automate a pipeline
+
+Use the `workflow-automate` command to generate a full CI/CD setup for your project:
+
+```bash
+/cicd-automation:workflow-automate
+```
+
+The command analyzes your project structure, detects languages and frameworks, identifies existing CI/CD configuration, and generates a complete pipeline tailored to what it finds. Pass a description to be more specific:
+
+```bash
+/cicd-automation:workflow-automate "Node.js API with Docker, deploy to EKS, run SAST on PRs"
+```
+
+## Example: full pipeline setup
+
+<Steps>
+  <Step title="Install the plugin">
+    ```bash
+    /plugin install cicd-automation
+    ```
+  </Step>
+
+  <Step title="Design your pipeline architecture">
+    Describe your requirements in natural language — the `deployment-pipeline-design` skill activates automatically:
+
+    ```
+    "Design a multi-stage pipeline: lint and test on every push, build and
+     push Docker image on merge to main, deploy to staging automatically,
+     deploy to production with manual approval"
+    ```
+
+    The skill produces a stage diagram, job dependency graph, and recommended caching strategy before any code is written.
+  </Step>
+
+  <Step title="Generate the workflow file">
+    Ask for the concrete workflow configuration:
+
+    ```
+    "Generate the GitHub Actions workflow for this pipeline"
+    ```
+
+    The `github-actions-templates` skill produces a complete `.github/workflows/ci-cd.yaml` with:
+    - Separate jobs for lint, test, build, and deploy
+    - Docker layer caching via `actions/cache`
+    - Environment-scoped deployments with protection rules
+    - OIDC-based AWS authentication (no long-lived credentials)
+  </Step>
+
+  <Step title="Secure your secrets">
+    ```
+    "Set up secrets management — we use AWS Secrets Manager for database
+     credentials and need secret rotation every 30 days"
+    ```
+
+    The `secrets-management` skill generates IAM role definitions, Vault or AWS Secrets Manager configuration, and rotation Lambda function code. It also audits the generated workflow for any hardcoded credentials.
+  </Step>
+
+  <Step title="Add PR enhancement">
+    Install the PR workflows plugin to automatically annotate pull requests with deployment context:
+
+    ```bash
+    /plugin install git-pr-workflows
+    /git-pr-workflows:pr-enhance
+    ```
+
+    This adds pipeline status, deployment preview links, and review checklists to every PR description.
+  </Step>
+
+  <Step title="Run the workflow automation command">
+    Generate all remaining files automatically:
+
+    ```bash
+    /cicd-automation:workflow-automate
+    ```
+
+    The command writes the full workflow configuration, validates it against the CI platform's schema, and suggests any missing quality gates.
+  </Step>
+</Steps>
+
+## Progressive disclosure in practice
+
+The four skills use Anthropic's progressive disclosure architecture. Here is what this means in practice:
+
+```
+User: "Implement Kubernetes deployment with Helm"
+  → k8s-manifest-generator skill description is always loaded (metadata tier)
+  → User request matches trigger → full skill content loads (instructions tier)
+  → Agent references examples directory on demand (resources tier)
+  → Result: Production-grade K8s manifests with Helm charts
+```
+
+This three-tier pattern keeps your context window lean. A full `cicd-automation` install adds roughly the same tokens as a short README, not a 500-page manual.
+
+## Multi-plugin composition
+
+For a complete feature delivery pipeline, compose `cicd-automation` with other plugins:
+
+```bash
+# 1. Develop the feature
+/backend-development:feature-development "payment processing API"
+
+# 2. Add security scanning
+/security-scanning:security-hardening
+
+# 3. Generate tests
+/unit-testing:test-generate
+
+# 4. Review implementation
+/comprehensive-review:full-review
+
+# 5. Set up CI/CD pipeline
+/cicd-automation:workflow-automate
+
+# 6. Add monitoring
+/observability-monitoring:monitor-setup
+```
+
+<Tip>
+When setting up pipelines for Kubernetes workloads, use `kubernetes-operations` alongside `cicd-automation`. The `kubernetes-architect` agent (Opus) designs the cluster architecture and GitOps structure, while `deployment-engineer` (Haiku) handles the pipeline jobs that build and push images. This Opus → Haiku orchestration pattern optimizes for both quality and cost.
+</Tip>

@@ -1,0 +1,140 @@
+---
+title: "Frontend and mobile development with React agents"
+description: "Build React, React Native, and mobile apps using Claude Code Agents' frontend and multi-platform plugins with automated component scaffolding."
+---
+
+The frontend and mobile development plugins cover the full spectrum of modern client-side work — from React 19 server components and Next.js 15 App Router patterns, to cross-platform React Native and Flutter apps, native iOS with Swift/SwiftUI, and accessible UI design systems. Each agent is assigned a model tier that balances cost against the complexity of the task.
+
+## Install the plugins
+
+<Tabs>
+  <Tab title="Web (React / Next.js)">
+    ```bash
+    /plugin install frontend-mobile-development
+    ```
+  </Tab>
+  <Tab title="Cross-platform and mobile">
+    ```bash
+    /plugin install frontend-mobile-development
+    /plugin install multi-platform-apps
+    ```
+  </Tab>
+  <Tab title="Accessibility and quality">
+    ```bash
+    /plugin install accessibility-compliance
+    /plugin install comprehensive-review
+    ```
+  </Tab>
+</Tabs>
+
+## Scaffold a component
+
+The `component-scaffold` command generates a production-ready React or React Native component including TypeScript types, styles, tests, and Storybook stories:
+
+```bash
+/frontend-mobile-development:component-scaffold "UserProfile component with hooks"
+/frontend-mobile-development:component-scaffold "DataTable with sorting, filtering, and pagination"
+/frontend-mobile-development:component-scaffold "PaymentForm with Stripe Elements -- platform native"
+```
+
+Each scaffold produces:
+
+- The component file with proper TypeScript interfaces
+- CSS Modules, styled-components, or Tailwind classes (detected from your project)
+- A test file with `@testing-library/react` covering render, interaction, and accessibility
+- Storybook stories for the default and interactive states
+- An index barrel file for clean imports
+
+## Agents in these plugins
+
+<CardGroup cols={2}>
+  <Card title="frontend-developer" icon="browser">
+    React 19 and Next.js 15 expert. Masters Server Components, Server Actions, the App Router, Suspense streaming, Zustand and TanStack Query for state management, and Core Web Vitals optimization. Includes WCAG 2.1/2.2 AA compliance in every implementation.
+  </Card>
+  <Card title="mobile-developer" icon="mobile">
+    Cross-platform expert covering React Native New Architecture (Fabric, TurboModules), Flutter 3.x with Riverpod/BLoC, offline-first data sync, biometric auth, deep linking, and CI/CD with EAS and Fastlane.
+  </Card>
+  <Card title="ios-developer" icon="apple">
+    Native iOS with Swift and SwiftUI. Covers SwiftUI data flow, Core Data, async/await patterns, WidgetKit, Live Activities, and App Store Connect automation.
+  </Card>
+  <Card title="flutter-expert" icon="layer-group">
+    Advanced Flutter development with Dart 3 null safety, Impeller rendering engine migration, custom render engines, plugin FFI, and multi-platform deployment (mobile, web, desktop).
+  </Card>
+  <Card title="ui-designer" icon="paintbrush">
+    UI/UX design for web and mobile, design token systems, component library architecture, interaction design, and WCAG accessibility compliance. Runs on Opus.
+  </Card>
+  <Card title="ui-ux-designer" icon="pencil-ruler">
+    Interface design, wireframes, and design system creation for multi-platform apps. Works alongside frontend and mobile developers to maintain visual consistency.
+  </Card>
+</CardGroup>
+
+## Frontend skills
+
+The `frontend-mobile-development` plugin activates these skills based on context:
+
+| Skill | Description |
+|---|---|
+| `react-state-management` | Zustand, Jotai, and TanStack Query patterns |
+| `nextjs-app-router-patterns` | Next.js 14+ App Router, RSC, streaming, and Server Actions |
+| `tailwind-design-system` | Design systems with Tailwind CSS, component libraries, and tokens |
+| `react-native-architecture` | React Native navigation, native modules, and offline sync |
+
+## Usage examples
+
+```bash
+# React component scaffolding
+/frontend-mobile-development:component-scaffold "SearchBar with debounced input and suggestions"
+
+# Natural language for complex work
+"Use frontend-developer to build a server component that streams data with Suspense boundaries"
+"Have frontend-developer create a form with Server Actions and optimistic updates"
+
+# Cross-platform mobile feature
+"Use mobile-developer to implement biometric authentication across iOS and Android"
+
+# Flutter app
+"Have flutter-expert architect a cross-platform e-commerce app with offline capabilities"
+
+# Native iOS feature
+"Use ios-developer to implement Live Activities for a delivery tracking feature"
+
+# Design system work
+"Have ui-designer create a design token system with dark mode and theming support"
+```
+
+## Accessibility compliance
+
+Install the `accessibility-compliance` plugin to run WCAG 2.2 audits and screen reader testing alongside your frontend work:
+
+```bash
+/plugin install accessibility-compliance
+/accessibility-compliance:accessibility-audit
+```
+
+The `ui-visual-validator` agent in this plugin performs visual regression testing and verifies that generated components meet accessibility requirements. Skills activated include `wcag-audit-patterns` and `screen-reader-testing` (NVDA, JAWS, and VoiceOver).
+
+## Pull request enhancement
+
+The `comprehensive-review` plugin's `pr-enhance` command runs a multi-perspective review — architecture, security, and performance — over your frontend changes before they merge:
+
+```bash
+/plugin install comprehensive-review
+/comprehensive-review:pr-enhance
+```
+
+The `architect-reviewer` (Opus), `code-reviewer` (Opus), and `security-auditor` (Opus) agents run in parallel, producing a consolidated review with severity-ranked findings.
+
+<Tip>
+  The `frontend-developer` and `mobile-developer` agents use the `inherit` model tier, meaning they run on whichever model you start your Claude Code session with (`claude --model sonnet` or `claude --model opus`). This lets you control cost for high-volume component work while keeping Opus available for architecture decisions.
+</Tip>
+
+## Multi-platform orchestration
+
+For apps that need to ship on web, iOS, Android, and desktop simultaneously, the `multi-platform-apps` plugin provides a coordinated development command:
+
+```bash
+/plugin install multi-platform-apps
+/multi-platform-apps:multi-platform "Push notification system with rich media"
+```
+
+This coordinates `frontend-developer`, `mobile-developer`, `ios-developer`, `flutter-expert`, and `ui-ux-designer` to produce consistent implementations across all target platforms.

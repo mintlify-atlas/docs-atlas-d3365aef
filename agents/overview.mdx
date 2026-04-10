@@ -1,0 +1,134 @@
+---
+title: "Agents: specialized AI experts for every domain"
+description: "Learn how Claude Code Agents' 182 domain experts work — their model tier assignments, how to invoke them, and how skills extend their capabilities."
+---
+
+Agents are the domain experts inside every plugin. Each agent is a focused AI specialist — a backend architect, a security auditor, a Kubernetes engineer — bundled with a curated system prompt, a model assignment, and optional tool restrictions. When you install a plugin, its agents become available immediately in your Claude Code session, ready to be invoked by natural language or a direct slash command.
+
+## What an agent is
+
+An agent is a Markdown file (`agents/<name>.md`) with a YAML frontmatter block followed by a system prompt. The frontmatter controls everything Claude needs to know to route and invoke the agent:
+
+```yaml
+---
+name: backend-architect
+description: "RESTful API design, microservice boundaries, database schemas. Use PROACTIVELY when designing APIs or evaluating architecture."
+model: opus
+color: blue          # optional — terminal label colour
+tools: Read, Grep, Glob   # optional — restricts available tools
+---
+```
+
+### Frontmatter fields
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `name` | Yes | Hyphen-case identifier used in slash commands |
+| `description` | Yes | What the agent does and when to trigger it — Claude reads this to decide which agent to route a request to |
+| `model` | Yes | One of `opus`, `sonnet`, `haiku`, or `inherit` |
+| `color` | No | Terminal display colour for visual identification |
+| `tools` | No | Comma-separated list restricting available tools |
+
+<Note>
+The `description` field is the primary routing signal. Write it with an explicit "Use when…" or "Use PROACTIVELY when…" trigger clause so Claude selects the right agent automatically.
+</Note>
+
+## Invoking agents
+
+### Natural language
+
+Let Claude choose the right specialist based on your request:
+
+```
+"Use backend-architect to design the authentication API"
+"Have security-auditor scan for OWASP vulnerabilities"
+"Get performance-engineer to optimise this database query"
+```
+
+Claude reads each installed agent's `description` and routes to the best match.
+
+### Direct slash commands
+
+Many agents are accessible through plugin-namespaced slash commands for deterministic invocation:
+
+```bash
+/backend-development:feature-development "user authentication"
+/security-scanning:security-sast
+/incident-response:smart-fix "memory leak in payment service"
+/python-development:python-scaffold fastapi-microservice
+```
+
+The format is always `/<plugin-name>:<command-name>`.
+
+## Model tiers
+
+Every agent is assigned to one of four model tiers, balancing capability against cost:
+
+| Tier | Model | Agent count | When to use |
+|------|-------|-------------|-------------|
+| **Tier 1** | `opus` | 42 | Critical architecture, security reviews, all code review, production coding |
+| **Tier 2** | `inherit` | 42 | Complex tasks — uses the model you started your session with |
+| **Tier 3** | `sonnet` | 51 | Support with intelligence: docs, testing, debugging, APIs, payments |
+| **Tier 4** | `haiku` | 18 | Fast operational tasks: SEO, deployment, simple docs, content, search |
+
+### Opus — critical decisions
+
+Assigned to agents where mistakes are expensive: `backend-architect`, `security-auditor`, `code-reviewer`, `cloud-architect`, `incident-responder`. Opus 4.6 leads SWE-bench at 80.8% and uses 65 % fewer tokens on complex reasoning, which often offsets its higher per-token rate.
+
+### Inherit — user-controlled
+
+Agents marked `inherit` use whatever model you started your Claude Code session with:
+
+```bash
+claude --model opus    # all inherit agents use Opus
+claude --model sonnet  # all inherit agents use Sonnet
+```
+
+Falls back to Sonnet 4.6 when no default is set. Useful when you want cost control for high-volume AI/ML or frontend work.
+
+### Sonnet — complex reasoning at scale
+
+The balanced tier covers language experts, DevOps engineers, data engineers, documentation architects, and most framework specialists. `python-pro`, `typescript-pro`, `deployment-engineer`, and similar agents all run on Sonnet.
+
+### Haiku — fast operational tasks
+
+The lightest tier handles deterministic, template-driven work: SEO optimisers, deployment automation, content planners, reference builders, and context managers. Sub-second latency with lowest per-token cost.
+
+## Hybrid orchestration patterns
+
+Combining model tiers in a pipeline delivers both quality and cost efficiency:
+
+```
+Opus    → backend-architect   (design API contracts)
+           ↓
+Sonnet  → python-pro          (implement the service)
+           ↓
+Haiku   → test-automator      (generate pytest suites)
+           ↓
+Opus    → code-reviewer       (security and architecture review)
+           ↓
+Haiku   → deployment-engineer (CI/CD pipeline setup)
+```
+
+The `full-stack-orchestration` plugin pre-configures exactly this pattern for end-to-end feature delivery.
+
+## Skills: progressive knowledge disclosure
+
+Agents can activate **skills** — modular knowledge packages stored alongside the plugin. Skills use a three-tier progressive disclosure model so only the knowledge needed for the current task enters the context:
+
+1. **Metadata** — name and activation criteria (always loaded with the plugin)
+2. **Instructions** — core guidance and patterns (loaded when the skill is activated)
+3. **Resources** — examples, templates, and reference files (loaded on demand)
+
+For example, `python-pro` can activate `async-python-patterns`, `python-testing-patterns`, or `uv-package-manager` depending on what you ask it to do.
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Agent catalog" icon="list" href="/agents/catalog">
+    Browse all 182 agents with models, descriptions, and plugin locations.
+  </Card>
+  <Card title="Plugin overview" icon="puzzle-piece" href="/plugins/overview">
+    Learn how plugins bundle agents and how to install them.
+  </Card>
+</CardGroup>
